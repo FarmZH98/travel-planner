@@ -30,10 +30,10 @@ export class LoginComponent implements OnInit {
 
     //communicate with backend
     this.loginService.login(this.form.value['username'], this.form.value['password'])
-      .then(token => 
+      .then((response: any) => 
         {
           //store token
-          this.token = token
+          this.token = response.token
           console.log(this.token)
           localStorage.setItem('token', this.token)
         })

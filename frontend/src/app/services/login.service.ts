@@ -7,12 +7,12 @@ export class LoginService {
 
     private readonly http = inject(HttpClient)
 
-    login(username: string, password: string): Promise<string> {
+    login(username: string, password: string) {
         const headers = new HttpHeaders()
             .set('username', username)
             .set('password', password)
 
-        return firstValueFrom(this.http.get<string>('/api/login', { headers }))
+        return firstValueFrom(this.http.get<Object>('/api/login', { headers }))
             
     }
 
@@ -29,4 +29,5 @@ export class LoginService {
 
         return firstValueFrom(this.http.post<Object>("/api/signup", params, {headers}));
     }
+
 }

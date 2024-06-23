@@ -11,6 +11,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginService } from './services/login.service';
 import { FormRepository } from './repo/form.repository';
 import { SignUpComponent } from './components/sign-up.component';
+import { NewEntryComponent } from './components/new-entry.component';
 
 //Material imports
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -23,12 +24,15 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
+
 import { GoogleMapsModule } from '@angular/google-maps';
+import { TravelService } from './services/travel.service';
 
 const appRoutes: Routes = [
   {path: '', component: LoginComponent},
   {path: 'home', component: HomeComponent},
   {path: 'signup', component: SignUpComponent},
+  {path: 'new', component: NewEntryComponent},
   { path: '**', redirectTo: '/',  pathMatch:"full" }
 ]
 
@@ -37,7 +41,8 @@ const appRoutes: Routes = [
     AppComponent,
     LoginComponent,
     HomeComponent,
-    SignUpComponent
+    SignUpComponent,
+    NewEntryComponent
   ],
   imports: [
     BrowserModule,
@@ -57,7 +62,7 @@ const appRoutes: Routes = [
     RouterModule.forRoot(appRoutes, { useHash: true })
   ],
   providers: [
-    LoginService, FormRepository, provideAnimationsAsync()
+    TravelService, LoginService, FormRepository, provideAnimationsAsync()
   ],
   bootstrap: [AppComponent]
 })

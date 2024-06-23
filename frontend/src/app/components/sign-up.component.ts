@@ -50,10 +50,6 @@ export class SignUpComponent implements OnInit {
         alert(response.error.message)
         
       )
-
-    
-
-    //this.router.navigate(['/games'], { queryParams: { q: this.form.value['q'] } })
   }
 
 

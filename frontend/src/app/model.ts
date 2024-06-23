@@ -3,9 +3,25 @@ export interface LoginRequest {
     password: string
 }
 
-export interface Upload {
-    name: string
+export interface User {
+    username: string
+    password: string
+    firstname: string
+    lastname: string
+    email: string
+    gender: string
+    token: string
+}
+
+export interface Travel {
     title: string
-    comments: string
-    pictures: Blob[]
+    places: Place[]
+    startDate: Date
+    endDate: Date
+    token: string
+}
+
+export interface Place {
+    name: string
+    date: Date
 }

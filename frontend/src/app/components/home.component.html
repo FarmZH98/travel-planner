@@ -1,1 +1,33 @@
-<h1>Home works</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <mat-toolbar color="primary">
+        <mat-toolbar-row>
+            <span>Home</span>
+        </mat-toolbar-row>
+    </mat-toolbar>
+    <mat-divider></mat-divider>
+    <button class="create-new" mat-stroked-button type="button" [routerLink]="['/new']">New</button>
+    <!-- show a list of existing plans -->
+     @if (plans.length==0) {
+        <mat-list>
+            <mat-list-item *ngFor="let plan of plans">
+                <button mat-icon-button (click)="edit(plan)">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="view(plan)">
+                    <mat-icon>view</mat-icon>
+                </button>
+            </mat-list-item>
+        </mat-list>
+     } @else {
+        <h3>You have no plans. Create a new one first</h3>
+     }
+    
+</body>
+</html>

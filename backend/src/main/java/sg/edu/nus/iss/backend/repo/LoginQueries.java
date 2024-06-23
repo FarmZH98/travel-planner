@@ -14,6 +14,6 @@ public interface LoginQueries {
 
     public final static String GET_TOKEN = 
     """
-    SELECT token FROM user WHERE username=?, password=?        
+    SELECT token FROM user WHERE username=? and password=?        
     """;
 }
