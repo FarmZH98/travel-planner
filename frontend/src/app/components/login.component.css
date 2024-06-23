@@ -1,0 +1,13 @@
+.login-button {
+    border: 2px solid black;
+    background: green;
+}
+
+.signup-button {
+    background-color: sandybrown;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px;
+}
