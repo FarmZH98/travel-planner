@@ -5,4 +5,5 @@ import java.util.Date;
 public class Place {
     private String name;
     private Date date;
+    private String notes;
 }

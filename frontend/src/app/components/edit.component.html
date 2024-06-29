@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Entry</title>
+    <title>Edit</title>
     <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script> -->
 </head>
 <body>
     <mat-toolbar color="primary">
         <mat-toolbar-row>
-            <span>New Entry</span>
+            <span>Edit</span>
         </mat-toolbar-row>
     </mat-toolbar>
 
@@ -17,7 +17,7 @@
     <div class="content">
         
         
-        <form [formGroup]="form" (ngSubmit)="create()">
+        <form [formGroup]="form" (ngSubmit)="update()">
             
             <div>
                 <mat-form-field>
@@ -62,17 +62,8 @@
                 </div>
             </div>
             <div class="my-google-map" id="map">
-                <!-- <google-map></google-map> -->
+                <google-map></google-map>
             </div>
-
-            <!-- <div formArrayName="addresses" *ngIf="addresses.controls.length > 0">
-                <div *ngFor="let addressControl of addresses.controls; let i = index">
-                  <label for="address{{ i }}">Address for Day {{ i + 1 }}:</label>
-                  <input [id]="'address' + i" type="text" [formControlName]="i">
-                  <button (click)="getCoordinates()">Get Coordinates</button>
-                  <br>
-                </div>
-            </div> -->
 
             <div>
                 <mat-divider></mat-divider>
@@ -87,8 +78,9 @@
                 </mat-list>
             </div>
 
-            <button type="submit" [disabled]="form.invalid">Create</button>
+            <button type="submit" [disabled]="form.invalid">Update</button>
         </form>
+            <button type="button" (click)="deleteTrip()">Delete</button>
     </div>
 </body>
 </html>

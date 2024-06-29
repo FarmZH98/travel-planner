@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View</title>
+    <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script> -->
+</head>
+<body>
+    <mat-toolbar color="primary">
+        <mat-toolbar-row class="mainbar">
+            <span>Trip Details</span>
+            <button type="button" mat-flat-button (click)="logout()">Logout</button>
+        </mat-toolbar-row>
+    </mat-toolbar>
+
+    <mat-divider></mat-divider>
+    <div class="content">
+        <mat-card *ngIf="trip">
+            <mat-card-header>
+              <mat-card-title>{{ trip.title }}</mat-card-title>
+            </mat-card-header>
+
+            <mat-card-content>
+              <p><strong>Notes:</strong> {{ trip.notes }}</p>
+              <p><strong>Start Date:</strong> {{ trip.startDate | date }}</p>
+              <p><strong>End Date:</strong> {{ trip.endDate | date }}</p>
+              <p><strong>Places:</strong> {{ trip.places }}</p>
+            </mat-card-content>
+        </mat-card>
+        <div class="my-google-map" id="map">
+            <google-map></google-map>
+        </div>
+
+        <button type="button" (click)="sendEmail()">Send Email</button>
+    </div>
+</body>
+</html>

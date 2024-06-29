@@ -41,4 +41,14 @@ public class LoginRepo implements LoginQueries {
 
         return "The given username and password do not match. Please try again";
     }
+
+    public Boolean checkToken(String token) {
+        final SqlRowSet rs = jdbcTemplate.queryForRowSet(CHECK_TOKEN, token);
+
+        while (rs.next()) {
+            return true;
+        }
+
+        return false;
+    }
 }

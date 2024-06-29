@@ -22,17 +22,23 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import {MatCardModule} from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import {MatDatepickerModule} from '@angular/material/datepicker';
 
 import { GoogleMapsModule } from '@angular/google-maps';
 import { TravelService } from './services/travel.service';
+import { MatNativeDateModule } from '@angular/material/core';
+import { EditComponent } from './components/edit.component';
+import { ViewComponent } from './components/view.component';
 
 const appRoutes: Routes = [
   {path: '', component: LoginComponent},
   {path: 'home', component: HomeComponent},
   {path: 'signup', component: SignUpComponent},
   {path: 'new', component: NewEntryComponent},
+  {path: 'edit', component: EditComponent},
+  {path: 'view', component: ViewComponent},
   { path: '**', redirectTo: '/',  pathMatch:"full" }
 ]
 
@@ -42,7 +48,9 @@ const appRoutes: Routes = [
     LoginComponent,
     HomeComponent,
     SignUpComponent,
-    NewEntryComponent
+    NewEntryComponent,
+    EditComponent,
+    ViewComponent
   ],
   imports: [
     BrowserModule,
@@ -52,12 +60,14 @@ const appRoutes: Routes = [
     MatToolbarModule,
     MatDividerModule,
     MatFormFieldModule,
-    MatRadioModule,
     MatInputModule,
     MatListModule,
     MatIconModule,
-    MatCheckboxModule,
     MatButtonModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatCardModule,
+    MatRadioModule,
     GoogleMapsModule,
     RouterModule.forRoot(appRoutes, { useHash: true })
   ],

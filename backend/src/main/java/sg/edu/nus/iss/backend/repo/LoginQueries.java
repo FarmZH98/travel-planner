@@ -16,4 +16,13 @@ public interface LoginQueries {
     """
     SELECT token FROM user WHERE username=? and password=?        
     """;
+
+    public final static String CHECK_TOKEN = 
+    """
+    SELECT username FROM user WHERE token=?   
+    """;
 }
+
+// SELECT SupplierName
+// FROM Suppliers
+// WHERE EXISTS (SELECT ProductName FROM Products WHERE Products.SupplierID = Suppliers.supplierID AND Price < 20);

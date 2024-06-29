@@ -7,21 +7,23 @@
 </head>
 <body>
     <mat-toolbar color="primary">
-        <mat-toolbar-row>
+        <mat-toolbar-row class="mainbar">
             <span>Home</span>
+            <button type="button" mat-flat-button (click)="logout()">Logout</button>
         </mat-toolbar-row>
     </mat-toolbar>
     <mat-divider></mat-divider>
     <button class="create-new" mat-stroked-button type="button" [routerLink]="['/new']">New</button>
     <!-- show a list of existing plans -->
-     @if (plans.length==0) {
+     @if (plans.length != 0) {
         <mat-list>
             <mat-list-item *ngFor="let plan of plans">
+                {{plan.title}} | {{plan.startDate}} to {{plan.endDate}}
                 <button mat-icon-button (click)="edit(plan)">
                     <mat-icon>edit</mat-icon>
                 </button>
                 <button mat-icon-button (click)="view(plan)">
-                    <mat-icon>view</mat-icon>
+                    <mat-icon>visibility</mat-icon>
                 </button>
             </mat-list-item>
         </mat-list>

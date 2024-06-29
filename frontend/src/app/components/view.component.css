@@ -3,3 +3,8 @@
     height: 500px;
     margin: auto;
 }
+
+.mainbar {
+    display: flex;
+    justify-content: space-between;
+}

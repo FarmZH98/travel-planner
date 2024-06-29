@@ -28,24 +28,35 @@ export class HomeComponent implements OnInit {
     } 
 
     //get user details to display welcome
-    this.travelService.getTravelDetails(token)
+    this.travelService.getTripsSummary(token)
     .then(
-      (response) : any => 
-        console.log(response)
+      (response: any) => {
+        for(var i=0; i<response.travels.length; ++i) {
+          var trip = JSON.parse(response.travels[i])
+          console.log(trip)
+          trip.startDate = trip.startDate.replace(' 00:00:00 GMT+08:00', '');
+          trip.endDate = trip.endDate.replace(' 00:00:00 GMT+08:00', '');
+          this.plans.push(trip)
+        }
+        console.log(this.plans)
+      }
     ).catch(error => 
       console.log(error)
     );
   }
 
   edit(plan: any) {
-    throw new Error('Method not implemented.');
+    const queryParams = { id: plan.id }
+    this.router.navigate(['/edit'] , { queryParams })
   }
 
   view(plan: any) {
-    throw new Error('Method not implemented.');
+    const queryParams = { id: plan.id }
+    this.router.navigate(['/view'] , { queryParams })
   }
 
   logout() {
     localStorage.removeItem('token')
+    this.router.navigate(['/'])
   }
 }

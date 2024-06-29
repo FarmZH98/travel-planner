@@ -15,7 +15,7 @@ export interface User {
 
 export interface Travel {
     title: string
-    places: Place[]
+    places: string[]
     startDate: Date
     endDate: Date
     token: string
