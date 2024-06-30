@@ -23,6 +23,7 @@ export class NewEntryComponent implements OnInit {
   clickedLocation: { lat: number; lng: number } | null = null;
   address: string = '';
   addresses: any[] = [];
+  places: any[] = [];
   markers: any[] = [];
   latitude: number | null = null;
   longitude: number | null = null;
@@ -33,10 +34,10 @@ export class NewEntryComponent implements OnInit {
 
   ngOnInit(): void {
     //check for token
-    this.token = localStorage.getItem('token')
-    if(this.token == null) {
+    this.token = localStorage.getItem('token');
+    if(localStorage.getItem('token') == null) {
       this.router.navigate(['/'])
-    }
+    } 
 
     this.form = this.fb.group({
       title: this.fb.control<string>('', [ Validators.required]),
@@ -47,14 +48,10 @@ export class NewEntryComponent implements OnInit {
       validator: this.dateRangeValidator
     })
 
-    // this.form.valueChanges.subscribe(() => {
-    //   if (this.form.valid) {
-    //     this.generateAddressControls();
-    //   }
-    // });
 
     const options = {
-      fields: ["address_components", "geometry", "icon", "name", "formatted_address"],
+      //fields: ["address_components", "geometry", "icon", "name", "formatted_address"],
+      fields: ["address_components", "name", "formatted_address"],
       strictBounds: false,
     };
 
@@ -64,7 +61,9 @@ export class NewEntryComponent implements OnInit {
     autocomplete.addListener('place_changed', () => {
       const place = autocomplete?.getPlace();
       console.log(place)
+      
       if (place && place.formatted_address) {
+        this.places.push(place);
         this.address = place.formatted_address;
       }
       });
@@ -92,27 +91,6 @@ export class NewEntryComponent implements OnInit {
     return null;
   }
 
-  // get addresses(): FormArray {
-  //   return this.form.get('addresses') as FormArray;
-  // }
-
-  // generateAddressControls() {
-  //   const start = new Date(this.form.get('startdate')?.value);
-  //   const end = new Date(this.form.get('enddate')?.value);
-
-  //   if (start && end && this.form.valid) {
-  //     const addressesArray = this.addresses;
-  //     addressesArray.clear();
-
-  //     let currentDate = start;
-  //     while (currentDate <= end) {
-  //       addressesArray.push(this.fb.control('', Validators.required));
-  //       currentDate.setDate(currentDate.getDate() + 1);
-  //     }
-  //   }
-
-  // }
-
   create() {
     const travel: Travel = {
       places: this.addresses,
@@ -130,8 +108,9 @@ export class NewEntryComponent implements OnInit {
       });
   }
 
-  deleteAddress(address: string) {
-    const idx = this.addresses.indexOf(address)
+  deleteAddress(place: any) {
+    const idx = this.places.indexOf(place)
+    this.places.splice(idx, 1)
     this.addresses.splice(idx, 1)
     this.markers[idx].setMap(null);
     this.markers.splice(idx, 1);
@@ -163,11 +142,6 @@ export class NewEntryComponent implements OnInit {
       this.map.setCenter(location);
       this.map.setZoom(15);
 
-      // if (this.marker) {
-      //   this.marker.setMap(null);
-      // }
-
-      //this.marker = 
       this.markers.push(new google.maps.Marker({
         position: location,
         map: this.map,
@@ -175,9 +149,12 @@ export class NewEntryComponent implements OnInit {
       }));
     }
   }
+
+  back() {
+    this.router.navigate(['/home'])
+  }
   
+  isFormDirty() {
+    return this.form.dirty
+  }
 }
-
-
-
-

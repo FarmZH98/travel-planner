@@ -25,11 +25,11 @@ export class LoginComponent implements OnInit {
     })
   }
 
-  login() {
+  async login() {
     console.info(">>> form: ", this.form.value)
 
     //communicate with backend
-    this.loginService.login(this.form.value['username'], this.form.value['password'])
+    await this.loginService.login(this.form.value['username'], this.form.value['password'])
       .then((response: any) => 
         {
           //store token

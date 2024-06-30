@@ -21,9 +21,8 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     //check for token
 
-    const token: string = localStorage.getItem('token') ?? '';
-
-    if(localStorage.getItem('token') == '') {
+    const token: string = localStorage.getItem('token');
+    if(localStorage.getItem('token') == null) {
       this.router.navigate(['/'])
     } 
 
@@ -40,9 +39,10 @@ export class HomeComponent implements OnInit {
         }
         console.log(this.plans)
       }
-    ).catch(error => 
+    ).catch(error => {
+      //alert(error.message)
       console.log(error)
-    );
+    });
   }
 
   edit(plan: any) {

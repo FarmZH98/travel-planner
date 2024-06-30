@@ -1,3 +1,8 @@
 mat-form-field{
     width: 500px
 }
+
+.mainbar {
+    display: flex;
+    justify-content: space-between;
+}

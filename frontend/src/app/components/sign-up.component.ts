@@ -53,4 +53,8 @@ export class SignUpComponent implements OnInit {
   }
 
 
+  back() {
+    this.router.navigate(['/'])
+  }
+
 }

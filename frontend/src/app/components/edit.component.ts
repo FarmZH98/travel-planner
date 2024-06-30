@@ -49,9 +49,8 @@ export class EditComponent implements OnInit{
 
   async ngOnInit(){
     //check for token
-    this.token = localStorage.getItem('token') ?? '';
-
-    if(localStorage.getItem('token') == '') {
+    this.token = localStorage.getItem('token');
+    if(localStorage.getItem('token') == null) {
       this.router.navigate(['/'])
     } 
 
@@ -211,4 +210,13 @@ export class EditComponent implements OnInit{
         console.log(err)
       });
   }
+
+  back() {
+    this.router.navigate(['/home'])
+  }
+
+  isFormDirty() {
+    return this.form.dirty
+  }
+
 }

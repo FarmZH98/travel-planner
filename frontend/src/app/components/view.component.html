@@ -10,7 +10,7 @@
     <mat-toolbar color="primary">
         <mat-toolbar-row class="mainbar">
             <span>Trip Details</span>
-            <button type="button" mat-flat-button (click)="logout()">Logout</button>
+            <button type="button" mat-flat-button (click)="back()">Back</button>
         </mat-toolbar-row>
     </mat-toolbar>
 
@@ -25,7 +25,15 @@
               <p><strong>Notes:</strong> {{ trip.notes }}</p>
               <p><strong>Start Date:</strong> {{ trip.startDate | date }}</p>
               <p><strong>End Date:</strong> {{ trip.endDate | date }}</p>
-              <p><strong>Places:</strong> {{ trip.places }}</p>
+              <p><strong>Places:</strong></p>
+              <p>
+                <mat-list-item *ngFor="let p of trip.places">
+                    {{ p }}
+                </mat-list-item>
+              </p>
+                
+                
+            
             </mat-card-content>
         </mat-card>
         <div class="my-google-map" id="map">

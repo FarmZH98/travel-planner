@@ -22,24 +22,23 @@ export class ViewComponent {
 
   address: string = '';
   addresses: any[] = [];
+  places: any[] = [];
   addressError: string | null = null;
   map: google.maps.Map | null = null;
   marker: google.maps.Marker | null = null;
   markers: any[] = [];
-  token: string;
   trip: any;
 
   async ngOnInit(){
     //check for token
-    this.token = localStorage.getItem('token') ?? '';
-
-    if(localStorage.getItem('token') == '') {
+    const token: string = localStorage.getItem('token');
+    if(localStorage.getItem('token') == null) {
       this.router.navigate(['/'])
     } 
 
     //get value and input into form
     const travelId = this.activatedRoute.snapshot.queryParams['id']
-    this.sub$ = from(this.travelService.getTravelDetail(this.token, travelId))
+    this.sub$ = from(this.travelService.getTravelDetail(token, travelId))
       .subscribe({
         next: (value : any) => {
           console.info(value.trip)
@@ -51,10 +50,6 @@ export class ViewComponent {
           {
             this.updateExistingAddresses()
             console.info('>>>> COMPLETED')
-            const options = {
-              fields: ["address_components", "geometry", "icon", "name", "formatted_address"],
-              strictBounds: false,
-            };
         
             const mapElement = document.getElementById('map') as HTMLElement;
             // add markers and focus the map on the last marker
@@ -105,8 +100,8 @@ export class ViewComponent {
     //send to self in java
   }
 
-  logout() {
-    throw new Error('Method not implemented.');
+  back() {
+    this.router.navigate(['/home'])
   }
 
 }

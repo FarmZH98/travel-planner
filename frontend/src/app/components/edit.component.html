@@ -8,8 +8,9 @@
 </head>
 <body>
     <mat-toolbar color="primary">
-        <mat-toolbar-row>
+        <mat-toolbar-row class="mainbar">
             <span>Edit</span>
+            <button type="button" mat-flat-button (click)="back()">Back</button>
         </mat-toolbar-row>
     </mat-toolbar>
 
@@ -49,6 +50,7 @@
                   </mat-form-field>
             </div>
             <div>
+                <p>Add places to visit:</p>
                 <input id="address" placeholder="Enter address" />
                 <button type="button" (click)="getCoordinates()">Add</button>
                 

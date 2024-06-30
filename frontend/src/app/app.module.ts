@@ -31,13 +31,14 @@ import { TravelService } from './services/travel.service';
 import { MatNativeDateModule } from '@angular/material/core';
 import { EditComponent } from './components/edit.component';
 import { ViewComponent } from './components/view.component';
+import { leaveEditPage, leaveNewPage } from './guard';
 
 const appRoutes: Routes = [
   {path: '', component: LoginComponent},
   {path: 'home', component: HomeComponent},
   {path: 'signup', component: SignUpComponent},
-  {path: 'new', component: NewEntryComponent},
-  {path: 'edit', component: EditComponent},
+  {path: 'new', component: NewEntryComponent, canDeactivate: [ leaveNewPage ]},
+  {path: 'edit', component: EditComponent, canDeactivate: [ leaveEditPage ]},
   {path: 'view', component: ViewComponent},
   { path: '**', redirectTo: '/',  pathMatch:"full" }
 ]

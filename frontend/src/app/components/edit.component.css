@@ -1,5 +1,18 @@
 .my-google-map {
     width: 500px;
     height: 500px;
-    margin: auto;
+    /* margin: auto; */
+}
+
+.mainbar {
+    display: flex;
+    justify-content: space-between;
+}
+
+mat-form-field{
+    width: 500px
+}
+
+#address {
+    width: 500px
 }
