@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { GoogleMapsLoaderService } from '../services/gmap-loader.service';
 import { Travel } from '../model';
 import { TravelService } from '../services/travel.service';
+import { WeatherService } from '../services/weather.service';
 
 
 @Component({
@@ -17,12 +18,14 @@ export class NewEntryComponent implements OnInit {
   private readonly router = inject(Router)
   private readonly googleMapsLoader = inject(GoogleMapsLoaderService)
   private readonly travelService = inject(TravelService)
+  private readonly weatherService = inject(WeatherService)
 
   form!: FormGroup
 
   clickedLocation: { lat: number; lng: number } | null = null;
   address: string = '';
   addresses: any[] = [];
+  place: string = '';
   places: any[] = [];
   markers: any[] = [];
   latitude: number | null = null;
@@ -31,6 +34,7 @@ export class NewEntryComponent implements OnInit {
   map: google.maps.Map | null = null;
   marker: google.maps.Marker | null = null;
   token: string;
+  weather: any;
 
   ngOnInit(): void {
     //check for token
@@ -51,7 +55,7 @@ export class NewEntryComponent implements OnInit {
 
     const options = {
       //fields: ["address_components", "geometry", "icon", "name", "formatted_address"],
-      fields: ["address_components", "name", "formatted_address"],
+      fields: ["address_components", "name", "formatted_address", "url"],
       strictBounds: false,
     };
 
@@ -63,8 +67,9 @@ export class NewEntryComponent implements OnInit {
       console.log(place)
       
       if (place && place.formatted_address) {
-        this.places.push(place);
+        //this.places.push(place);
         this.address = place.formatted_address;
+        this.place = place.name
       }
       });
 
@@ -126,6 +131,9 @@ export class NewEntryComponent implements OnInit {
           console.log(coordinates)
           this.updateMap(coordinates.lat, coordinates.lng);
           this.addresses.push(this.address);
+          //this.getWeather(this.latitude, this.longitude)
+          const place = {address: this.address, lat: this.latitude, lon: this.longitude, name: this.place}
+          this.places.push(place);
         })
         .catch(err => {
           this.addressError = err;
@@ -156,5 +164,18 @@ export class NewEntryComponent implements OnInit {
   
   isFormDirty() {
     return this.form.dirty
+  }
+
+  getWeather(place: any) {
+    this.weatherService.getWeather(place.lat, place.lon)
+    .then(
+      (response: any) => {
+         this.weather = response;
+        console.log(response)
+      }
+    ).catch(error => {
+      //alert(error.message)
+      console.log(error)
+    });
   }
 }

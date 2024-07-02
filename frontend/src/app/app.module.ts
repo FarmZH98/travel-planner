@@ -32,6 +32,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { EditComponent } from './components/edit.component';
 import { ViewComponent } from './components/view.component';
 import { leaveEditPage, leaveNewPage } from './guard';
+import { WeatherService } from './services/weather.service';
 
 const appRoutes: Routes = [
   {path: '', component: LoginComponent},
@@ -73,7 +74,7 @@ const appRoutes: Routes = [
     RouterModule.forRoot(appRoutes, { useHash: true })
   ],
   providers: [
-    TravelService, LoginService, FormRepository, provideAnimationsAsync()
+    TravelService, LoginService, WeatherService, FormRepository, provideAnimationsAsync()
   ],
   bootstrap: [AppComponent]
 })

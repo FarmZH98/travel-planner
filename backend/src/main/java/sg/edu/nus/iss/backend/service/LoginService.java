@@ -47,4 +47,9 @@ public class LoginService {
         return loginRepo.checkToken(token);
     }
 
+    public User getUserDetails(String token) {
+
+        return loginRepo.getUserDetails(token);
+    }
+
 }

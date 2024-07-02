@@ -50,4 +50,10 @@ export class TravelService {
 
         return firstValueFrom(this.http.delete<Object>(`/api/travel/${id}`, { headers }))
     }
+
+    sendTripEmail(token: string, id: string) {
+        const headers = new HttpHeaders().set('token', token)
+
+        return firstValueFrom(this.http.get<Object>(`/api/travel/sendEmail/${id}`, { headers }))
+    }
 }

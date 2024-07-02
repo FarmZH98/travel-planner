@@ -79,7 +79,8 @@ export class EditComponent implements OnInit{
             this.updateExistingAddresses()
             console.info('>>>> COMPLETED')
             const options = {
-              fields: ["address_components", "geometry", "icon", "name", "formatted_address"],
+              //fields: ["address_components", "geometry", "icon", "name", "formatted_address"],
+              fields: ["address_components", "name", "formatted_address", "url"],
               strictBounds: false,
             };
         

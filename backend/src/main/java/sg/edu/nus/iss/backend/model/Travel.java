@@ -25,6 +25,14 @@ public class Travel {
     private String notes;
     private String id;
 
+    public String getStartDateFormatted() {
+        return startDate.toString().replace(" 00:00:00 GMT+08:00", "");
+    }
+
+    public String getEndDateFormatted() {
+        return endDate.toString().replace(" 00:00:00 GMT+08:00", "");
+    }
+
     public String toSummaryJsonString() {
 
         JsonObject taskAsJson = Json.createObjectBuilder()

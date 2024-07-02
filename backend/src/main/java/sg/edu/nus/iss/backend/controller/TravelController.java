@@ -26,6 +26,7 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 import sg.edu.nus.iss.backend.model.Travel;
+import sg.edu.nus.iss.backend.service.EmailService;
 import sg.edu.nus.iss.backend.service.LoginService;
 import sg.edu.nus.iss.backend.service.TravelService;
 import sg.edu.nus.iss.backend.util.Util;
@@ -39,6 +40,9 @@ public class TravelController {
 
     @Autowired
     private TravelService travelService;
+
+    @Autowired
+    private EmailService emailService;
     
     @GetMapping("/summary")
     public ResponseEntity<String> getTravelSummary(@RequestHeader String token) {
@@ -80,7 +84,7 @@ public class TravelController {
 
         try {
             //get travel details from MongoDB
-            String result = travelService.getTripDetailsById(token, id);
+            String result = travelService.getTripDetailsById(token, id).toJsonString();
             System.out.println(">>> result Json:" + result);
             
             //return travel details + firstname
@@ -168,6 +172,33 @@ public class TravelController {
             //return travel details + firstname
             return ResponseEntity.ok(
                         Json.createObjectBuilder()
+                        .build().toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Json.createObjectBuilder()
+				.add("message", e.getMessage())
+				.build().toString());
+        }
+    }
+
+    @GetMapping("/sendEmail/{id}")
+    public ResponseEntity<String> sendEmail(@RequestHeader String token, @PathVariable String id) {
+    
+        //check token
+        if(!loginService.checkToken(token)) {
+            return ResponseEntity.status(401).body(Json.createObjectBuilder()
+            .add("message", Util.NO_TOKEN_RESPONSE)
+            .build().toString());
+        }
+
+        try {
+            //get user and trip details
+            String response = emailService.sendEmail(token, id);
+            
+            //return travel details + firstname
+            return ResponseEntity.ok(
+                        Json.createObjectBuilder()
+                        .add("response", response)
                         .build().toString());
         } catch (Exception e) {
             e.printStackTrace();

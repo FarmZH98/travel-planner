@@ -28,17 +28,19 @@ export class ViewComponent {
   marker: google.maps.Marker | null = null;
   markers: any[] = [];
   trip: any;
+  token: string = ''
+  tripId: string = ''
 
   async ngOnInit(){
     //check for token
-    const token: string = localStorage.getItem('token');
+    this.token = localStorage.getItem('token');
     if(localStorage.getItem('token') == null) {
       this.router.navigate(['/'])
     } 
 
     //get value and input into form
-    const travelId = this.activatedRoute.snapshot.queryParams['id']
-    this.sub$ = from(this.travelService.getTravelDetail(token, travelId))
+    this.tripId = this.activatedRoute.snapshot.queryParams['id']
+    this.sub$ = from(this.travelService.getTravelDetail(this.token, this.tripId))
       .subscribe({
         next: (value : any) => {
           console.info(value.trip)
@@ -97,7 +99,12 @@ export class ViewComponent {
   }
 
   sendEmail() {
-    //send to self in java
+    this.travelService.sendTripEmail(this.token, this.tripId)
+    .then((response : any) => {
+      alert(response.response)
+    }).catch(err => {
+      alert(err.message)
+    });
   }
 
   back() {

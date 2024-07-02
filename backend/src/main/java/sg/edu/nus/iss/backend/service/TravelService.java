@@ -46,7 +46,7 @@ public class TravelService {
         return tripsJson;
     }
 
-    public String getTripDetailsById(String token, String id) {
+    public Travel getTripDetailsById(String token, String id) {
 
         Document travelRaw = travelRepo.getTripById(token, id);
         Travel travel = new Travel();
@@ -59,7 +59,8 @@ public class TravelService {
         travel.setEndDate(travelRaw.getDate("endDate"));
         System.out.println(">>> getTripDetailsById()" + travel.toString());
 
-        return travel.toJsonString();
+        return travel;
+        //return travel.toJsonString();
     }
 
     public void updateTravel(Travel travel) {

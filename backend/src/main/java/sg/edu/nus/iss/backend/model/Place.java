@@ -6,4 +6,7 @@ public class Place {
     private String name;
     private Date date;
     private String notes;
+    private float lat;
+    private float lon;
+    private String address;
 }

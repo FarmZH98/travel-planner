@@ -73,14 +73,26 @@
             <div>
                 <mat-divider></mat-divider>
                 <mat-list>
-                    <h3>Places to visit</h3>
+                    <h3><strong>Places to visit</strong></h3>
                     <mat-list-item *ngFor="let p of places">
-                        {{p.name}}: {{p.formatted_address}}
-                        <button mat-icon-button (click)="deleteAddress(p)">
+                        {{p.name}}: {{p.address}}
+                        <button type="button" mat-icon-button (click)="deleteAddress(p)">
                             <mat-icon>delete</mat-icon>
+                        </button>
+                        <button type="button" mat-icon-button (click)="getWeather(p)">
+                            <mat-icon>wb_sunny</mat-icon>
                         </button>
                     </mat-list-item>
                 </mat-list>
+            </div>
+
+            <div class="weatherbox">
+                @if (weather) {
+                    <p><strong>Weather:</strong></p> 
+                    <img src="http://openweathermap.org/img/w/{{weather.icon}}.png"> 
+                    {{weather.description}} - {{weather.city}}
+                }
+                
             </div>
 
             <button type="submit" [disabled]="form.invalid">Create</button>

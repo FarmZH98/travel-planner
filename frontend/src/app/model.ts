@@ -25,3 +25,10 @@ export interface Place {
     name: string
     date: Date
 }
+
+export interface WeatherData {
+    icon: string
+    main: string
+    description: string
+    city: string
+  }

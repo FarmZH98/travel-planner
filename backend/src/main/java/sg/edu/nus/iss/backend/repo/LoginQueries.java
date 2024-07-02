@@ -21,6 +21,11 @@ public interface LoginQueries {
     """
     SELECT username FROM user WHERE token=?   
     """;
+
+    public final static String GET_USER = 
+    """
+    SELECT firstname, lastname, email FROM user WHERE token=?   
+    """;
 }
 
 // SELECT SupplierName

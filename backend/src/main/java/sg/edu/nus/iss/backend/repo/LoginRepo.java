@@ -51,4 +51,18 @@ public class LoginRepo implements LoginQueries {
 
         return false;
     }
+
+    public User getUserDetails(String token) {
+        final SqlRowSet rs = jdbcTemplate.queryForRowSet(GET_USER, token);
+
+        User user = new User();
+
+        while (rs.next()) {
+            user.setFirstname(rs.getString("firstname"));
+            user.setLastname(rs.getString("lastname"));
+            user.setEmail(rs.getString("email"));
+        }
+
+        return user;
+    }
 }
