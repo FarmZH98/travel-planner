@@ -5,6 +5,7 @@ import { GoogleMapsLoaderService } from '../services/gmap-loader.service';
 import { Travel } from '../model';
 import { TravelService } from '../services/travel.service';
 import { WeatherService } from '../services/weather.service';
+import { OllamaService } from '../services/ollama.service';
 
 
 @Component({
@@ -35,6 +36,13 @@ export class NewEntryComponent implements OnInit {
   marker: google.maps.Marker | null = null;
   token: string;
   weather: any;
+  isCreated: boolean = false;
+
+  //Ollama
+  answers: any[] = [];
+  questionSent: boolean = false;
+  ollamaForm!: FormGroup;
+  private readonly ollamaService = inject(OllamaService)
 
   ngOnInit(): void {
     //check for token
@@ -79,6 +87,10 @@ export class NewEntryComponent implements OnInit {
       zoom: 15
     });
 
+    this.ollamaForm = this.fb.group({
+      text: ['', [Validators.required, Validators.minLength(3)]],
+    });   
+
   }
 
   dateRangeValidator(control: AbstractControl): { [key: string]: any } | null {
@@ -101,6 +113,7 @@ export class NewEntryComponent implements OnInit {
       places: this.addresses,
       ...this.form.value
     }
+    this.isCreated = true
 
     this.travelService.createTravel(travel, this.token).then(
       (response: any) => {
@@ -178,4 +191,29 @@ export class NewEntryComponent implements OnInit {
       console.log(error)
     });
   }
+
+  //referred from https://github.com/kenken64/ollama-app/blob/main/client/src/app/chat/
+  sendMessage() {
+    console.log("Sending...");
+    if(this.ollamaForm.valid){
+      const text = this.ollamaForm.value.text;
+      const question = {by: "You", message: text}
+      this.answers.push(question)
+      console.log('User: ' + text);
+      //this.messages.push({text: text, sender: 'User', timestamp: new Date()});
+      this.questionSent = true;
+      this.ollamaService.chatWithOllama(text).then((response: any) => {
+        console.log(response)
+        const answer = {by: "Ollama", message: response.answer}
+        this.answers.push(answer)
+        this.questionSent = false;
+      })
+      .catch(err => {
+        alert(err.message)
+      });
+
+      this.ollamaForm.reset();
+    }
+  }
+  
 }

@@ -5,6 +5,7 @@ import { GoogleMapsLoaderService } from '../services/gmap-loader.service';
 import { Travel } from '../model';
 import { TravelService } from '../services/travel.service';
 import { Subscription, from } from 'rxjs';
+import { OllamaService } from '../services/ollama.service';
 
 @Component({
   selector: 'app-edit',
@@ -35,6 +36,13 @@ export class EditComponent implements OnInit{
   range: FormGroup<any>;
   startDate: FormControl<any>;
   endDate: FormControl<any>;
+  isEdited: boolean = false
+
+  //Ollama
+  answers: any[] = [];
+  questionSent: boolean = false;
+  ollamaForm!: FormGroup;
+  private readonly ollamaService = inject(OllamaService)
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
@@ -104,6 +112,11 @@ export class EditComponent implements OnInit{
         
           }
       })
+
+      this.ollamaForm = this.fb.group({
+        text: ['', [Validators.required, Validators.minLength(3)]],
+      });   
+  
   }
 
   dateRangeValidator(control: AbstractControl): { [key: string]: any } | null {
@@ -188,6 +201,9 @@ export class EditComponent implements OnInit{
       id: this.trip.id,
       ...this.form.value
     }
+
+    this.isEdited = true
+
     this.travelService.updateTravelDetails(travel, this.token).then(
       (response: any) => {
         console.log(response)
@@ -218,6 +234,30 @@ export class EditComponent implements OnInit{
 
   isFormDirty() {
     return this.form.dirty
+  }
+
+  //referred from https://github.com/kenken64/ollama-app/blob/main/client/src/app/chat/
+  sendMessage() {
+    console.log("Sending...");
+    if(this.ollamaForm.valid){
+      const text = this.ollamaForm.value.text;
+      const question = {by: "You", message: text}
+      this.answers.push(question)
+      console.log('User: ' + text);
+      //this.messages.push({text: text, sender: 'User', timestamp: new Date()});
+      this.questionSent = true;
+      this.ollamaService.chatWithOllama(text).then((response: any) => {
+        console.log(response)
+        const answer = {by: "Ollama", message: response.answer}
+        this.answers.push(answer)
+        this.questionSent = false;
+      })
+      .catch(err => {
+        alert(err.message)
+      });
+
+      this.ollamaForm.reset();
+    }
   }
 
 }

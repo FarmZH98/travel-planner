@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -7,7 +6,6 @@ import { environment } from '../../environments/environment';
 
 @Injectable()
 export class GoogleMapsLoaderService {
-  private apiKey: string = environment.googleMapsApiKey;
 
   constructor() { }
 

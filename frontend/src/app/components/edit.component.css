@@ -16,3 +16,40 @@ mat-form-field{
 #address {
     width: 500px
 }
+
+.ollama-container {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.ollama-header {
+    padding: 5px;
+    background: rgb(113, 40, 230);
+}
+
+.ollama-messages {
+    padding-top: 10px;
+}
+
+.ollama-input {
+    width: 100%;
+    padding-top: 10px;
+    background: white;
+    left: 20%;
+}
+
+#ollamaForm button {
+    width: 8%;
+    padding: 5px;
+    margin-left: 1%;
+}
+
+.ollama-wrap {
+    border-radius: 6px;
+    background-color: aliceblue;
+    border: 2px dashed gray;
+    max-width: 70%;
+    padding: 1em;
+    margin-bottom: .4em;
+}

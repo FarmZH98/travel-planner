@@ -25,6 +25,8 @@ import { MatIconModule } from '@angular/material/icon';
 import {MatCardModule} from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import {MatDatepickerModule} from '@angular/material/datepicker';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { GoogleMapsModule } from '@angular/google-maps';
 import { TravelService } from './services/travel.service';
@@ -33,6 +35,7 @@ import { EditComponent } from './components/edit.component';
 import { ViewComponent } from './components/view.component';
 import { leaveEditPage, leaveNewPage } from './guard';
 import { WeatherService } from './services/weather.service';
+import { OllamaService } from './services/ollama.service';
 
 const appRoutes: Routes = [
   {path: '', component: LoginComponent},
@@ -70,11 +73,13 @@ const appRoutes: Routes = [
     MatNativeDateModule,
     MatCardModule,
     MatRadioModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
     GoogleMapsModule,
     RouterModule.forRoot(appRoutes, { useHash: true })
   ],
   providers: [
-    TravelService, LoginService, WeatherService, FormRepository, provideAnimationsAsync()
+    TravelService, LoginService, WeatherService, OllamaService, FormRepository, provideAnimationsAsync()
   ],
   bootstrap: [AppComponent]
 })

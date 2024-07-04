@@ -7,7 +7,7 @@ export const leaveEditPage: CanDeactivateFn<EditComponent> =
 (comp: EditComponent, route: ActivatedRouteSnapshot, state: RouterStateSnapshot)
     : boolean | UrlTree | Promise<boolean | UrlTree> | Observable<boolean | UrlTree>  => {
 
-    if (comp.isFormDirty())
+    if (comp.isFormDirty() && !comp.isEdited)
         return confirm('You have not saved your form. Are you sure?')
     
     return true
@@ -18,7 +18,7 @@ export const leaveNewPage: CanDeactivateFn<NewEntryComponent> =
 (comp: NewEntryComponent, route: ActivatedRouteSnapshot, state: RouterStateSnapshot)
     : boolean | UrlTree | Promise<boolean | UrlTree> | Observable<boolean | UrlTree>  => {
 
-    if (comp.isFormDirty())
+    if (comp.isFormDirty() && !comp.isCreated)
         return confirm('You have not saved your form. Are you sure?')
     
     return true

@@ -72,6 +72,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>io.github.amithkoujalgi</groupId>
+			<artifactId>ollama4j</artifactId>
+			<version>1.0.47</version>
+		</dependency>
 
 	</dependencies>
 

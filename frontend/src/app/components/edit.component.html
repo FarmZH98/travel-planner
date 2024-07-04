@@ -81,8 +81,41 @@
             </div>
 
             <button type="submit" [disabled]="form.invalid">Update</button>
-        </form>
             <button type="button" (click)="deleteTrip()">Delete</button>
+        </form>
+            
+    </div>
+    <br>
+    <div class="ollama-container">
+        <div class="ollama-header">
+            <h2 class="ollama-title">Ollama Chat App</h2>
+        </div>
+    
+        <div class="ollama-tip">
+            <p><i>Chat with our AI bot to help plan your travels!</i></p>
+        </div>
+    
+        <div class="ollama-messages" *ngFor="let a of answers">
+            <span>{{a.by}}: </span>
+            <p class="ollama-wrap" matTooltip="{{ a.message }}">{{ a.message }}</p>
+        </div>
+
+        <div>
+            <mat-spinner *ngIf="questionSent"></mat-spinner>
+        </div>
+    
+        <div class="ollama-input">
+            <form [formGroup]="ollamaForm" id="ollamaForm" (ngSubmit)="sendMessage()">
+                <mat-form-field class="example-full-width" appearance="fill">
+                    <input matInput formControlName="text" placeholder="Type a message">
+                    <mat-error *ngIf="ollamaForm?.get('text')?.invalid">Message is required</mat-error>
+                </mat-form-field>
+                <button mat-fab extended color="primary" type="submit" [disabled]="questionSent">
+                    <mat-icon>send</mat-icon>
+                </button>
+            </form>
+        </div>
+    
     </div>
 </body>
 </html>
