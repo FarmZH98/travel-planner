@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule, provideClientHydration } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -36,6 +36,8 @@ import { ViewComponent } from './components/view.component';
 import { leaveEditPage, leaveNewPage } from './guard';
 import { WeatherService } from './services/weather.service';
 import { OllamaService } from './services/ollama.service';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { TravelStore } from './travel.store';
 
 const appRoutes: Routes = [
   {path: '', component: LoginComponent},
@@ -76,10 +78,16 @@ const appRoutes: Routes = [
     MatProgressSpinnerModule,
     MatTooltipModule,
     GoogleMapsModule,
-    RouterModule.forRoot(appRoutes, { useHash: true })
+    RouterModule.forRoot(appRoutes, { useHash: true }),
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    })
   ],
   providers: [
-    TravelService, LoginService, WeatherService, OllamaService, FormRepository, provideAnimationsAsync()
+    TravelService, LoginService, WeatherService, OllamaService, TravelStore, FormRepository, provideAnimationsAsync()
   ],
   bootstrap: [AppComponent]
 })

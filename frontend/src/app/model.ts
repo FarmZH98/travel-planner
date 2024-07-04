@@ -19,6 +19,7 @@ export interface Travel {
     startDate: Date
     endDate: Date
     token: string
+    id: string
 }
 
 export interface Place {
@@ -31,4 +32,8 @@ export interface WeatherData {
     main: string
     description: string
     city: string
-  }
+}
+  
+export interface TravelsSlice {
+    trips: Travel[]
+}
