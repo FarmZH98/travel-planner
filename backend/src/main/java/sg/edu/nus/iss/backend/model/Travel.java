@@ -20,8 +20,8 @@ public class Travel {
     private Date startDate;
     private Date endDate;
     private String token;
-    private List<String> places;
-    //private List<Place> places;
+    //private List<String> places;
+    private List<Place> places;
     private String notes;
     private String id;
 
@@ -64,11 +64,11 @@ public class Travel {
         return taskAsJson.toString();
     }
 
-    private JsonArray convertListToJsonArray(List<String> list) {
+    private JsonArray convertListToJsonArray(List<Place> places) {
         JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
 
-        for (String item : list) {
-            arrayBuilder.add(item);
+        for (Place place : places) {
+            arrayBuilder.add(place.toJsonString());
         }
 
         return arrayBuilder.build();

@@ -55,48 +55,56 @@
                 <input id="address" placeholder="Enter address" />
                 <button type="button" (click)="getCoordinates()">Add</button>
                 
-                <div *ngIf="latitude !== null && longitude !== null">
+                <!-- <div *ngIf="latitude !== null && longitude !== null">
                 <p>Latitude: {{ latitude }}</p>
                 <p>Longitude: {{ longitude }}</p>
-                </div>
+                </div> -->
             
                 <div *ngIf="addressError">
                 <p>Error: {{ addressError }}</p>
                 </div>
             </div>
             <br>
-            <div class="my-google-map" id="map">
-                <google-map></google-map>
+            <div id="map-container">
+                <div class="my-google-map" id="map">
+                    <google-map>
+                    </google-map>
+                </div>
+                <div id="sidebar"></div>
             </div>
-
+            
 
             <div>
                 <mat-divider></mat-divider>
                 <mat-list>
                     <h3><strong>Places to visit</strong></h3>
+                    <!-- <p>Select main mode of transport: </p> -->
                     <mat-list-item *ngFor="let p of places">
-                        {{p.name}}: {{p.address}}
+                        <a href="{{p.url}}" target="_blank">{{p.name}} </a> : {{p.address}}
                         <button type="button" mat-icon-button (click)="deleteAddress(p)">
                             <mat-icon>delete</mat-icon>
                         </button>
                         <button type="button" mat-icon-button (click)="getWeather(p)">
                             <mat-icon>wb_sunny</mat-icon>
                         </button>
+                        <button type="button" mat-icon-button (click)="calculateRoute(p)" *ngIf="this.isRouteVisible(p)">
+                            <mat-icon> directions</mat-icon>
+                        </button>
                     </mat-list-item>
                 </mat-list>
             </div>
 
-            <div class="weatherbox">
-                @if (weather) {
-                    <p><strong>Weather:</strong></p> 
-                    <img src="http://openweathermap.org/img/w/{{weather.icon}}.png"> 
-                    {{weather.description}} - {{weather.city}}
-                }
-                
-            </div>
-
             <button type="submit" [disabled]="form.invalid">Create</button>
         </form>
+
+        <div class="weatherbox">
+            @if (weather) {
+                <p><strong>Weather:</strong></p> 
+                <img src="http://openweathermap.org/img/w/{{weather.icon}}.png"> 
+                {{weather.description}} - {{weather.city}}
+            }
+            
+        </div>
     </div>
     <br>
     <div class="ollama-container">

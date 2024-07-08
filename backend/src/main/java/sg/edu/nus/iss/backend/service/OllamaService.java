@@ -14,7 +14,8 @@ import io.github.amithkoujalgi.ollama4j.core.utils.OptionsBuilder;
 @Service
 public class OllamaService {
 
-    
+    @Value("${public.ollama.host}")
+    private String ollamaURL;
     
     public String chatWithOllama(String question) throws OllamaBaseException, 
             IOException, InterruptedException {

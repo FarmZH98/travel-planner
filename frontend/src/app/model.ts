@@ -15,7 +15,7 @@ export interface User {
 
 export interface Travel {
     title: string
-    places: string[]
+    places: Place[]
     startDate: Date
     endDate: Date
     token: string
@@ -24,7 +24,10 @@ export interface Travel {
 
 export interface Place {
     name: string
-    date: Date
+    lat: number
+    lon: number
+    address: string 
+    url: string
 }
 
 export interface WeatherData {

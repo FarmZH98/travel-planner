@@ -2,8 +2,9 @@ import { Component, OnInit, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GoogleMapsLoaderService } from '../services/gmap-loader.service';
-import { Travel } from '../model';
+import { Place, Travel } from '../model';
 import { TravelService } from '../services/travel.service';
+import { WeatherService } from '../services/weather.service';
 import { Subscription, from } from 'rxjs';
 import { OllamaService } from '../services/ollama.service';
 
@@ -18,6 +19,7 @@ export class EditComponent implements OnInit{
   private readonly googleMapsLoader = inject(GoogleMapsLoaderService)
   private readonly travelService = inject(TravelService)
   private readonly activatedRoute = inject(ActivatedRoute)
+  private readonly weatherService = inject(WeatherService)
 
   form!: FormGroup
   sub$!: Subscription
@@ -25,6 +27,9 @@ export class EditComponent implements OnInit{
   clickedLocation: { lat: number; lng: number } | null = null;
   address: string = '';
   addresses: any[] = [];
+  gplace: any;
+  place: string = '';
+  places: Place[] = [];
   latitude: number | null = null;
   longitude: number | null = null;
   addressError: string | null = null;
@@ -36,6 +41,7 @@ export class EditComponent implements OnInit{
   range: FormGroup<any>;
   startDate: FormControl<any>;
   endDate: FormControl<any>;
+  weather: any;
   isEdited: boolean = false
 
   //Ollama
@@ -69,7 +75,32 @@ export class EditComponent implements OnInit{
         next: (value : any) => {
           console.info(value.trip)
           this.trip = JSON.parse(value.trip)
-          console.log(new Date(this.trip.startDate))
+          this.trip.places.forEach((place: string) => {
+            this.places.push(JSON.parse(place))
+          });
+          const options = {
+            //fields: ["address_components", "geometry", "icon", "name", "formatted_address"],
+            fields: ["address_components", "name", "formatted_address", "url"],
+            strictBounds: false,
+          };
+      
+          const input = document.getElementById('address') as HTMLInputElement;
+          //this.autocomplete = new google.maps.places.Autocomplete(input, options);
+          const autocomplete = new google.maps.places.Autocomplete(input, options);
+          autocomplete.addListener('place_changed', () => {
+            this.gplace = autocomplete?.getPlace();
+            if (this.gplace && this.gplace.formatted_address) {
+              this.address = this.gplace.formatted_address;
+              this.place = this.gplace.name
+            }
+            });
+      
+          const mapElement = document.getElementById('map') as HTMLElement;
+          // add markers and focus the map on the last marker
+          this.map = new google.maps.Map(mapElement, {
+            center: { lat: 1.2908306, lng: 103.7764078 },
+            zoom: 15
+          });
         },
         error: value => console.error('>>> ERROR promise -> observable: ', value),
         complete: () => 
@@ -86,29 +117,6 @@ export class EditComponent implements OnInit{
 
             this.updateExistingAddresses()
             console.info('>>>> COMPLETED')
-            const options = {
-              //fields: ["address_components", "geometry", "icon", "name", "formatted_address"],
-              fields: ["address_components", "name", "formatted_address", "url"],
-              strictBounds: false,
-            };
-        
-            const input = document.getElementById('address') as HTMLInputElement;
-            //this.autocomplete = new google.maps.places.Autocomplete(input, options);
-            const autocomplete = new google.maps.places.Autocomplete(input, options);
-            autocomplete.addListener('place_changed', () => {
-              const place = autocomplete?.getPlace();
-              console.log(place)
-              if (place && place.formatted_address) {
-                this.address = place.formatted_address;
-              }
-              });
-        
-            const mapElement = document.getElementById('map') as HTMLElement;
-            // add markers and focus the map on the last marker
-            this.map = new google.maps.Map(mapElement, {
-              center: { lat: 1.2908306, lng: 103.7764078 },
-              zoom: 15
-            });
         
           }
       })
@@ -135,22 +143,22 @@ export class EditComponent implements OnInit{
   }
 
   updateExistingAddresses() {
-    this.addresses = this.trip.places;
-    console.log(this.trip.places)
+    
+    //this.places = this.trip.places;
+    console.log(this.places[0].lat)
 
     //update map marker
-    for(var i=0; i<this.addresses.length; ++i) {
-      this.address = this.addresses[i]
-      console.log(this.address)
-      this.googleMapsLoader.getCoordinates(this.address)
-      .then(coordinates => {
-        this.updateMap(coordinates.lat, coordinates.lng);
-      })
-      .catch(err => {
-        this.addressError = err;
-        console.log(this.addressError)
-      });
+    for(var i=0; i<this.places.length; ++i) {
+      this.updateMap(this.places[i].lat, this.places[i].lon)
     }
+  }
+
+  deleteAddress(place: any) {
+    const idx = this.places.indexOf(place)
+    this.places.splice(idx, 1)
+    this.addresses.splice(idx, 1)
+    this.markers[idx].setMap(null);
+    this.markers.splice(idx, 1);
   }
 
   getCoordinates() {
@@ -163,7 +171,8 @@ export class EditComponent implements OnInit{
           console.log(coordinates)
           this.updateMap(coordinates.lat, coordinates.lng);
           this.addresses.push(this.address);
-          //console.log(this.form.invalid)
+          const place = {address: this.gplace.formatted_address, lat: this.latitude, lon: this.longitude, name: this.gplace.name, url: this.gplace.url}
+          this.places.push(place);
         })
         .catch(err => {
           this.addressError = err;
@@ -176,6 +185,7 @@ export class EditComponent implements OnInit{
 
   updateMap(lat: number, lng: number) {
     if (this.map) {
+      console.log(lat + " " + lng)
       const location = new google.maps.LatLng(lat, lng);
       this.map.setCenter(location);
       this.map.setZoom(15);
@@ -188,16 +198,40 @@ export class EditComponent implements OnInit{
     }
   }
 
-  deleteAddress(address: string) {
-    const idx = this.addresses.indexOf(address)
-    this.addresses.splice(idx, 1)
-    this.markers[idx].setMap(null);
-    this.markers.splice(idx, 1);
+  calculateRoute(p: any): void {
+    const directionsService = new google.maps.DirectionsService();
+    const directionsRenderer = new google.maps.DirectionsRenderer();
+    console.log("im here")
+    var idx = this.places.indexOf(p);
+
+    directionsRenderer.setMap(this.map);
+    directionsRenderer.setPanel(document.getElementById("sidebar") as HTMLElement);
+
+    const origin = { lat: p.lat, lng: p.lon }; // Example origin (San Francisco)
+    const destination = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon }; // Example destination (Los Angeles)
+
+    directionsService.route(
+      {
+        origin: origin,
+        destination: destination,
+        travelMode: google.maps.TravelMode.TRANSIT
+      }).then((response) => {
+        directionsRenderer.setDirections(response);
+      })
+      .catch((e) => window.alert("Directions request failed due to " + e.message));
   }
+
+  isRouteVisible(p: any): boolean {
+    
+    if(this.places.indexOf(p)==0) return false
+
+    return true
+  }
+
 
   update() {
     const travel: Travel = {
-      places: this.addresses,
+      places: this.places,
       id: this.trip.id,
       ...this.form.value
     }
@@ -234,6 +268,19 @@ export class EditComponent implements OnInit{
 
   isFormDirty() {
     return this.form.dirty
+  }
+
+  getWeather(place: any) {
+    this.weatherService.getWeather(place.lat, place.lon)
+    .then(
+      (response: any) => {
+         this.weather = response;
+        console.log(response)
+      }
+    ).catch(error => {
+      //alert(error.message)
+      console.log(error)
+    });
   }
 
   //referred from https://github.com/kenken64/ollama-app/blob/main/client/src/app/chat/

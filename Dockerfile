@@ -9,6 +9,7 @@ RUN npm i -g @angular/cli@17.3.8
 COPY frontend/angular.json .
 COPY frontend/package*.json .
 COPY frontend/tsconfig*.json .
+COPY frontend/ngsw-config.json .
 COPY frontend/src src
 
 # Build the Angular app with environment variables

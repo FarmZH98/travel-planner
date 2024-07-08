@@ -7,6 +7,7 @@ import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import sg.edu.nus.iss.backend.model.Place;
 import sg.edu.nus.iss.backend.model.Travel;
 import sg.edu.nus.iss.backend.repo.TravelRepo;
 
@@ -17,7 +18,7 @@ public class TravelService {
     private TravelRepo travelRepo;
 
     public Travel saveTravel(Travel travel) {
-        return travelRepo.save(travel);
+        return travelRepo.saveTravel(travel);
     }
 
     public List<String> getAllTravels(String token) {
@@ -54,17 +55,23 @@ public class TravelService {
         travel.setId(travelRaw.getObjectId("_id").toHexString());
         travel.setToken(token);
         travel.setNotes(travelRaw.getString("notes"));
-        travel.setPlaces(travelRaw.getList("places", String.class));
         travel.setStartDate(travelRaw.getDate("startDate"));
         travel.setEndDate(travelRaw.getDate("endDate"));
+        List<Document> placesDocs = travelRaw.getList("places", Document.class);
+        List<Place> places = placesDocs.stream()
+                               .map(Place::documentToPlace)
+                               .toList();
+        // List<Place> places = travelRaw.getList("places", String.class).stream()
+        //                         .map(value -> Place.jsonToPlace(value))
+        //                         .toList();
+        travel.setPlaces(places);
         System.out.println(">>> getTripDetailsById()" + travel.toString());
 
         return travel;
-        //return travel.toJsonString();
     }
 
     public void updateTravel(Travel travel) {
-        travelRepo.update(travel);
+        travelRepo.updateTravel(travel);
     }
 
     public void deleteTravel(String token, String id) {

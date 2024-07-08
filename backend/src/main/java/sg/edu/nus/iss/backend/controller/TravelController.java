@@ -1,8 +1,6 @@
 package sg.edu.nus.iss.backend.controller;
 
-import java.io.ByteArrayInputStream;
 import java.io.StringReader;
-import java.text.DateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -16,7 +14,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +22,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
+import sg.edu.nus.iss.backend.model.Place;
 import sg.edu.nus.iss.backend.model.Travel;
 import sg.edu.nus.iss.backend.service.EmailService;
 import sg.edu.nus.iss.backend.service.LoginService;
@@ -114,7 +112,6 @@ public class TravelController {
 
             //create travel object from payload
             Travel travel = convertPayloadToTravel(token, payload);
-
             Travel savedTravel = travelService.saveTravel(travel);
 
             return ResponseEntity.ok(
@@ -141,7 +138,6 @@ public class TravelController {
         try {
             //convert payload to travel
             Travel travel = convertPayloadToTravel(token, payload);
-
             travelService.updateTravel(travel);
             
             //return travel details + firstname
@@ -227,10 +223,14 @@ public class TravelController {
         travel.setEndDate(date);
         travel.setNotes(data.getString("notes"));
         travel.setTitle(data.getString("title"));
-        travel.setPlaces(data.getJsonArray("places").stream()
-                                .map(value -> value.toString().replace("\"", ""))
-                                .toList());
         travel.setToken(token);
+
+        List<Place> places = data.getJsonArray("places").stream()
+                                //.map(value -> value.toString().replace("\"", ""))
+                                .map(value -> value.toString())
+                                .map(Place::jsonToPlace)
+                                .toList();
+        travel.setPlaces(places);
 
         if(data.containsKey("id")) {
             travel.setId(data.getString("id"));

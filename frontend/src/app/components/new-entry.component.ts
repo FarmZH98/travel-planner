@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GoogleMapsLoaderService } from '../services/gmap-loader.service';
-import { Travel } from '../model';
+import { Place, Travel } from '../model';
 import { TravelService } from '../services/travel.service';
 import { WeatherService } from '../services/weather.service';
 import { OllamaService } from '../services/ollama.service';
@@ -26,13 +26,15 @@ export class NewEntryComponent implements OnInit {
   clickedLocation: { lat: number; lng: number } | null = null;
   address: string = '';
   addresses: any[] = [];
+  gplace: any;
   place: string = '';
-  places: any[] = [];
+  places: Place[] = [];
   markers: any[] = [];
   latitude: number | null = null;
   longitude: number | null = null;
   addressError: string | null = null;
   map: google.maps.Map | null = null;
+  directions: google.maps.DirectionsResult;
   marker: google.maps.Marker | null = null;
   token: string;
   weather: any;
@@ -71,13 +73,13 @@ export class NewEntryComponent implements OnInit {
     //this.autocomplete = new google.maps.places.Autocomplete(input, options);
     const autocomplete = new google.maps.places.Autocomplete(input, options);
     autocomplete.addListener('place_changed', () => {
-      const place = autocomplete?.getPlace();
-      console.log(place)
+      this.gplace = autocomplete?.getPlace();
+      console.log(this.gplace)
       
-      if (place && place.formatted_address) {
+      if (this.gplace && this.gplace.formatted_address) {
         //this.places.push(place);
-        this.address = place.formatted_address;
-        this.place = place.name
+        this.address = this.gplace.formatted_address;
+        this.place = this.gplace.name
       }
       });
 
@@ -110,7 +112,7 @@ export class NewEntryComponent implements OnInit {
 
   create() {
     const travel: Travel = {
-      places: this.addresses,
+      places: this.places,
       ...this.form.value
     }
     this.isCreated = true
@@ -145,7 +147,7 @@ export class NewEntryComponent implements OnInit {
           this.updateMap(coordinates.lat, coordinates.lng);
           this.addresses.push(this.address);
           //this.getWeather(this.latitude, this.longitude)
-          const place = {address: this.address, lat: this.latitude, lon: this.longitude, name: this.place}
+          const place = {address: this.gplace.formatted_address, lat: this.latitude, lon: this.longitude, name: this.gplace.name, url: this.gplace.url}
           this.places.push(place);
         })
         .catch(err => {
@@ -169,6 +171,36 @@ export class NewEntryComponent implements OnInit {
         title: this.address
       }));
     }
+  }
+
+  calculateRoute(p: any): void {
+    const directionsService = new google.maps.DirectionsService();
+    const directionsRenderer = new google.maps.DirectionsRenderer();
+    console.log("im here")
+    var idx = this.places.indexOf(p);
+
+    directionsRenderer.setMap(this.map);
+    directionsRenderer.setPanel(document.getElementById("sidebar") as HTMLElement);
+
+    const origin = { lat: p.lat, lng: p.lon }; // Example origin (San Francisco)
+    const destination = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon }; // Example destination (Los Angeles)
+
+    directionsService.route(
+      {
+        origin: origin,
+        destination: destination,
+        travelMode: google.maps.TravelMode.TRANSIT
+      }).then((response) => {
+        directionsRenderer.setDirections(response);
+      })
+      .catch((e) => window.alert("Directions request failed due to " + e.message));
+  }
+
+  isRouteVisible(p: any): boolean {
+    
+    if(this.places.indexOf(p)==0) return false
+
+    return true
   }
 
   back() {
@@ -217,3 +249,4 @@ export class NewEntryComponent implements OnInit {
   }
   
 }
+

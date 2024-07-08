@@ -1,6 +1,23 @@
-.my-google-map {
-    width: 500px;
+#map {
+    flex-basis: 0;
+    flex-grow: 4;
+    height: 100%;
+}
+
+#sidebar {
+    flex-basis: 250px;
+    flex-grow: 1;
+    padding: 1rem;
+    max-width: 500px;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+#map-container {
     height: 500px;
+    width: 1000px;
+    display: flex;
     margin: auto;
 }
 

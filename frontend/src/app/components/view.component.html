@@ -27,19 +27,33 @@
               <p><strong>End Date:</strong> {{ trip.endDate | date }}</p>
               <p><strong>Places:</strong></p>
               <p>
-                <mat-list-item *ngFor="let p of trip.places">
-                    {{ p }}
+                <mat-list-item *ngFor="let p of places">
+                    <a href="{{p.url}}" target="_blank">{{p.name}} </a> : {{p.address}}
+                    <button type="button" mat-icon-button (click)="getWeather(p)">
+                        <mat-icon>wb_sunny</mat-icon>
+                    </button>
+                    <button type="button" mat-icon-button (click)="calculateRoute(p)" *ngIf="this.isRouteVisible(p)">
+                        <mat-icon> directions</mat-icon>
+                    </button>
                 </mat-list-item>
               </p>
-                
-                
-            
             </mat-card-content>
         </mat-card>
-        <div class="my-google-map" id="map">
-            <google-map></google-map>
+        <div id="map-container">
+            <div class="my-google-map" id="map">
+                <google-map>
+                </google-map>
+            </div>
+            <div id="sidebar"></div>
         </div>
-
+        <div class="weatherbox">
+            @if (weather) {
+                <p><strong>Weather:</strong></p> 
+                <img src="http://openweathermap.org/img/w/{{weather.icon}}.png"> 
+                {{weather.description}} - {{weather.city}}
+            }
+            
+        </div>
         <button type="button" (click)="sendEmail()">Email Me</button>
     </div>
 </body>

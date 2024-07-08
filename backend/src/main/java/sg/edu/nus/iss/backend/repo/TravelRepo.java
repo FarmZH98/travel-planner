@@ -23,7 +23,7 @@ public class TravelRepo {
     @Autowired
 	private MongoTemplate mongoTemplate;
 
-    public Travel save(Travel travel) {
+    public Travel saveTravel(Travel travel) {
 		Travel response = mongoTemplate.save(travel, "trips");
 
 		System.out.println(response.toString());
@@ -66,7 +66,7 @@ public class TravelRepo {
         return results.get(0);
     }
 
-    public void update(Travel travel) {
+    public void updateTravel(Travel travel) {
         Query query = Query.query(Criteria.where("_id").is(travel.getId()));
 
         Update updateOperation = new Update()
@@ -79,9 +79,6 @@ public class TravelRepo {
         UpdateResult result = mongoTemplate.updateMulti(query, updateOperation, Util.C_TRIPS);
 
         System.out.println(">>> result in update: " + result);
-
-		//return response;
-
 	}
 
     public void delete(String token, String id) {

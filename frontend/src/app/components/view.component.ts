@@ -2,9 +2,10 @@ import { Component, OnInit, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GoogleMapsLoaderService } from '../services/gmap-loader.service';
-import { Travel } from '../model';
+import { Place, Travel } from '../model';
 import { TravelService } from '../services/travel.service';
 import { Subscription, from } from 'rxjs';
+import { WeatherService } from '../services/weather.service';
 
 @Component({
   selector: 'app-view',
@@ -17,12 +18,13 @@ export class ViewComponent {
   private readonly googleMapsLoader = inject(GoogleMapsLoaderService)
   private readonly travelService = inject(TravelService)
   private readonly activatedRoute = inject(ActivatedRoute)
+  private readonly weatherService = inject(WeatherService)
 
   sub$!: Subscription
 
   address: string = '';
   addresses: any[] = [];
-  places: any[] = [];
+  places: Place[] = [];
   addressError: string | null = null;
   map: google.maps.Map | null = null;
   marker: google.maps.Marker | null = null;
@@ -30,6 +32,7 @@ export class ViewComponent {
   trip: any;
   token: string = ''
   tripId: string = ''
+  weather: any;
 
   async ngOnInit(){
     //check for token
@@ -45,41 +48,31 @@ export class ViewComponent {
         next: (value : any) => {
           console.info(value.trip)
           this.trip = JSON.parse(value.trip)
-          console.log(new Date(this.trip.startDate))
+          this.trip.places.forEach((place: string) => {
+            this.places.push(JSON.parse(place))
+          });
+          const mapElement = document.getElementById('map') as HTMLElement;
+          // add markers and focus the map on the last marker
+          this.map = new google.maps.Map(mapElement, {
+            center: { lat: 1.2908306, lng: 103.7764078 },
+            zoom: 15
+          });
         },
         error: value => console.error('>>> ERROR promise -> observable: ', value),
         complete: () => 
           {
             this.updateExistingAddresses()
             console.info('>>>> COMPLETED')
-        
-            const mapElement = document.getElementById('map') as HTMLElement;
-            // add markers and focus the map on the last marker
-            this.map = new google.maps.Map(mapElement, {
-              center: { lat: 1.2908306, lng: 103.7764078 },
-              zoom: 15
-            });
-        
           }
       })
   }
 
   updateExistingAddresses() {
-    this.addresses = this.trip.places;
-    console.log(this.trip.places)
+    console.log(this.places[0].lat)
 
     //update map marker
-    for(var i=0; i<this.addresses.length; ++i) {
-      this.address = this.addresses[i]
-      console.log(this.address)
-      this.googleMapsLoader.getCoordinates(this.address)
-      .then(coordinates => {
-        this.updateMap(coordinates.lat, coordinates.lng);
-      })
-      .catch(err => {
-        this.addressError = err;
-        console.log(this.addressError)
-      });
+    for(var i=0; i<this.places.length; ++i) {
+      this.updateMap(this.places[i].lat, this.places[i].lon)
     }
   }
 
@@ -97,6 +90,50 @@ export class ViewComponent {
       });
     }
   }
+
+  calculateRoute(p: any): void {
+    const directionsService = new google.maps.DirectionsService();
+    const directionsRenderer = new google.maps.DirectionsRenderer();
+    console.log("im here")
+    var idx = this.places.indexOf(p);
+
+    directionsRenderer.setMap(this.map);
+    directionsRenderer.setPanel(document.getElementById("sidebar") as HTMLElement);
+
+    const origin = { lat: p.lat, lng: p.lon }; // Example origin (San Francisco)
+    const destination = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon }; // Example destination (Los Angeles)
+
+    directionsService.route(
+      {
+        origin: origin,
+        destination: destination,
+        travelMode: google.maps.TravelMode.TRANSIT
+      }).then((response) => {
+        directionsRenderer.setDirections(response);
+      })
+      .catch((e) => window.alert("Directions request failed due to " + e.message));
+  }
+
+  isRouteVisible(p: any): boolean {
+    
+    if(this.places.indexOf(p)==0) return false
+
+    return true
+  }
+
+  getWeather(place: any) {
+    this.weatherService.getWeather(place.lat, place.lon)
+    .then(
+      (response: any) => {
+         this.weather = response;
+        console.log(response)
+      }
+    ).catch(error => {
+      //alert(error.message)
+      console.log(error)
+    });
+  }
+
 
   sendEmail() {
     this.travelService.sendTripEmail(this.token, this.tripId)

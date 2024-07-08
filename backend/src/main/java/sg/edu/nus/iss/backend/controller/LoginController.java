@@ -54,7 +54,7 @@ public class LoginController {
 
         String response = loginService.getToken(user);
 
-        if(response.contains("s")) {
+        if(response.contains("The given username and password do not match. Please try again")) {
             return ResponseEntity.status(400).body(Json.createObjectBuilder()
             .add("message", response)
             .build().toString()); 
