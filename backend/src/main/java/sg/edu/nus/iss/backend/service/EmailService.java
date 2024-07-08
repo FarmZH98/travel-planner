@@ -44,7 +44,7 @@ public class EmailService {
         context.setVariable("name", user.getFirstname() + " " + user.getLastname());
         context.setVariable("title", travel.getTitle());
         context.setVariable("notes", travel.getNotes());
-        context.setVariable("places", travel.getPlaces().toString());
+        context.setVariable("places", travel.getPlaces());
         context.setVariable("startDate", travel.getStartDateFormatted());
         context.setVariable("endDate", travel.getEndDateFormatted());
 

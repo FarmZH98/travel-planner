@@ -53,7 +53,9 @@
                 <p>Add places to visit:</p>
                 <input id="address" placeholder="Enter address" />
                 <button type="button" (click)="getCoordinates()">Add</button>
-            
+                <div *ngIf="addressError">
+                    <p>Error: {{ addressError }}</p>
+                </div>
             </div>
             <div id="map-container">
                 <div class="my-google-map" id="map">
@@ -68,14 +70,14 @@
                     <h3>Places to visit</h3>
                     <mat-list-item *ngFor="let p of places">
                         <a href="{{p.url}}" target="_blank">{{p.name}} </a> : {{p.address}}
-                        <button mat-icon-button (click)="deleteAddress(p)">
+                        <button mat-icon-button title="delete" (click)="deleteAddress(p)">
                             <mat-icon>delete</mat-icon>
                         </button>
-                        <button type="button" mat-icon-button (click)="getWeather(p)">
+                        <button type="button" title="weather" mat-icon-button (click)="getWeather(p)">
                             <mat-icon>wb_sunny</mat-icon>
                         </button>
-                        <button type="button" mat-icon-button (click)="calculateRoute(p)" *ngIf="this.isRouteVisible(p)">
-                            <mat-icon> directions</mat-icon>
+                        <button type="button" title="public transit directions" mat-icon-button (click)="calculateRoute(p)" *ngIf="this.isRouteVisible(p)">
+                            <mat-icon>directions</mat-icon>
                         </button>
                     </mat-list-item>
                 </mat-list>

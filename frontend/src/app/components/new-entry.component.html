@@ -54,11 +54,6 @@
                 <p>Add places to visit:</p>
                 <input id="address" placeholder="Enter address" />
                 <button type="button" (click)="getCoordinates()">Add</button>
-                
-                <!-- <div *ngIf="latitude !== null && longitude !== null">
-                <p>Latitude: {{ latitude }}</p>
-                <p>Longitude: {{ longitude }}</p>
-                </div> -->
             
                 <div *ngIf="addressError">
                 <p>Error: {{ addressError }}</p>

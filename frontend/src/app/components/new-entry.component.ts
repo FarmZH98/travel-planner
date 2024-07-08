@@ -20,22 +20,16 @@ export class NewEntryComponent implements OnInit {
   private readonly googleMapsLoader = inject(GoogleMapsLoaderService)
   private readonly travelService = inject(TravelService)
   private readonly weatherService = inject(WeatherService)
+  private readonly directionsService = new google.maps.DirectionsService()
+  private readonly directionsRenderer = new google.maps.DirectionsRenderer()
 
   form!: FormGroup
-
-  clickedLocation: { lat: number; lng: number } | null = null;
-  address: string = '';
-  addresses: any[] = [];
   gplace: any;
-  place: string = '';
   places: Place[] = [];
   markers: any[] = [];
-  latitude: number | null = null;
-  longitude: number | null = null;
   addressError: string | null = null;
   map: google.maps.Map | null = null;
   directions: google.maps.DirectionsResult;
-  marker: google.maps.Marker | null = null;
   token: string;
   weather: any;
   isCreated: boolean = false;
@@ -76,11 +70,6 @@ export class NewEntryComponent implements OnInit {
       this.gplace = autocomplete?.getPlace();
       console.log(this.gplace)
       
-      if (this.gplace && this.gplace.formatted_address) {
-        //this.places.push(place);
-        this.address = this.gplace.formatted_address;
-        this.place = this.gplace.name
-      }
       });
 
     const mapElement = document.getElementById('map') as HTMLElement;
@@ -131,30 +120,25 @@ export class NewEntryComponent implements OnInit {
   deleteAddress(place: any) {
     const idx = this.places.indexOf(place)
     this.places.splice(idx, 1)
-    this.addresses.splice(idx, 1)
     this.markers[idx].setMap(null);
     this.markers.splice(idx, 1);
   }
 
   getCoordinates() {
-    if (this.address) {
-      this.googleMapsLoader.getCoordinates(this.address)
+    const address=this.gplace.formatted_address
+    if (address) {
+      this.googleMapsLoader.getCoordinates(address)
         .then(coordinates => {
-          this.latitude = coordinates.lat;
-          this.longitude = coordinates.lng;
           this.addressError = null;
           console.log(coordinates)
           this.updateMap(coordinates.lat, coordinates.lng);
-          this.addresses.push(this.address);
           //this.getWeather(this.latitude, this.longitude)
-          const place = {address: this.gplace.formatted_address, lat: this.latitude, lon: this.longitude, name: this.gplace.name, url: this.gplace.url}
+          const place = {address: this.gplace.formatted_address, lat: coordinates.lat, lon: coordinates.lng, name: this.gplace.name, url: this.gplace.url}
           this.places.push(place);
         })
         .catch(err => {
           this.addressError = err;
           console.log(this.addressError)
-          this.latitude = null;
-          this.longitude = null;
         });
       }
     }
@@ -168,30 +152,30 @@ export class NewEntryComponent implements OnInit {
       this.markers.push(new google.maps.Marker({
         position: location,
         map: this.map,
-        title: this.address
+        title: this.gplace.formatted_address
       }));
     }
   }
 
   calculateRoute(p: any): void {
-    const directionsService = new google.maps.DirectionsService();
-    const directionsRenderer = new google.maps.DirectionsRenderer();
+    // const directionsService = new google.maps.DirectionsService();
+    // const directionsRenderer = new google.maps.DirectionsRenderer();
     console.log("im here")
     var idx = this.places.indexOf(p);
 
-    directionsRenderer.setMap(this.map);
-    directionsRenderer.setPanel(document.getElementById("sidebar") as HTMLElement);
+    this.directionsRenderer.setMap(this.map);
+    this.directionsRenderer.setPanel(document.getElementById("sidebar") as HTMLElement);
 
-    const origin = { lat: p.lat, lng: p.lon }; // Example origin (San Francisco)
-    const destination = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon }; // Example destination (Los Angeles)
+    const destination = { lat: p.lat, lng: p.lon }; 
+    const origin = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon }; 
 
-    directionsService.route(
+    this.directionsService.route(
       {
         origin: origin,
         destination: destination,
         travelMode: google.maps.TravelMode.TRANSIT
       }).then((response) => {
-        directionsRenderer.setDirections(response);
+        this.directionsRenderer.setDirections(response);
       })
       .catch((e) => window.alert("Directions request failed due to " + e.message));
   }

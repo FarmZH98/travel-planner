@@ -1,7 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GoogleMapsLoaderService } from '../services/gmap-loader.service';
 import { Place, Travel } from '../model';
 import { TravelService } from '../services/travel.service';
 import { Subscription, from } from 'rxjs';
@@ -15,19 +13,17 @@ import { WeatherService } from '../services/weather.service';
 export class ViewComponent {
 
   private readonly router = inject(Router)
-  private readonly googleMapsLoader = inject(GoogleMapsLoaderService)
   private readonly travelService = inject(TravelService)
   private readonly activatedRoute = inject(ActivatedRoute)
   private readonly weatherService = inject(WeatherService)
+  private readonly directionsService = new google.maps.DirectionsService()
+  private readonly directionsRenderer = new google.maps.DirectionsRenderer()
 
   sub$!: Subscription
 
-  address: string = '';
-  addresses: any[] = [];
   places: Place[] = [];
   addressError: string | null = null;
   map: google.maps.Map | null = null;
-  marker: google.maps.Marker | null = null;
   markers: any[] = [];
   trip: any;
   token: string = ''
@@ -68,16 +64,14 @@ export class ViewComponent {
   }
 
   updateExistingAddresses() {
-    console.log(this.places[0].lat)
-
     //update map marker
     for(var i=0; i<this.places.length; ++i) {
-      this.updateMap(this.places[i].lat, this.places[i].lon)
+      this.updateMap(this.places[i].lat, this.places[i].lon, this.places[i].address)
     }
   }
 
 
-  updateMap(lat: number, lng: number) {
+  updateMap(lat: number, lng: number, address: string) {
     if (this.map) {
       const location = new google.maps.LatLng(lat, lng);
       this.map.setCenter(location);
@@ -86,30 +80,31 @@ export class ViewComponent {
       new google.maps.Marker({
         position: location,
         map: this.map,
-        title: this.address
+        title: address
       });
     }
   }
 
   calculateRoute(p: any): void {
-    const directionsService = new google.maps.DirectionsService();
-    const directionsRenderer = new google.maps.DirectionsRenderer();
+    // const directionsService = new google.maps.DirectionsService();
+    // const directionsRenderer = new google.maps.DirectionsRenderer();
+    this.directionsRenderer.unbindAll()
     console.log("im here")
     var idx = this.places.indexOf(p);
 
-    directionsRenderer.setMap(this.map);
-    directionsRenderer.setPanel(document.getElementById("sidebar") as HTMLElement);
+    this.directionsRenderer.setMap(this.map);
+    this.directionsRenderer.setPanel(document.getElementById("sidebar") as HTMLElement);
 
-    const origin = { lat: p.lat, lng: p.lon }; // Example origin (San Francisco)
-    const destination = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon }; // Example destination (Los Angeles)
+    const destination = { lat: p.lat, lng: p.lon }; 
+    const origin = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon }; 
 
-    directionsService.route(
+    this.directionsService.route(
       {
         origin: origin,
         destination: destination,
         travelMode: google.maps.TravelMode.TRANSIT
       }).then((response) => {
-        directionsRenderer.setDirections(response);
+        this.directionsRenderer.setDirections(response);
       })
       .catch((e) => window.alert("Directions request failed due to " + e.message));
   }

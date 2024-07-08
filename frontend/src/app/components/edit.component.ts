@@ -20,27 +20,19 @@ export class EditComponent implements OnInit{
   private readonly travelService = inject(TravelService)
   private readonly activatedRoute = inject(ActivatedRoute)
   private readonly weatherService = inject(WeatherService)
+  private readonly directionsService = new google.maps.DirectionsService();
+  private readonly directionsRenderer = new google.maps.DirectionsRenderer();
 
   form!: FormGroup
   sub$!: Subscription
 
-  clickedLocation: { lat: number; lng: number } | null = null;
-  address: string = '';
-  addresses: any[] = [];
   gplace: any;
-  place: string = '';
   places: Place[] = [];
-  latitude: number | null = null;
-  longitude: number | null = null;
   addressError: string | null = null;
   map: google.maps.Map | null = null;
-  marker: google.maps.Marker | null = null;
   markers: any[] = [];
   token: string;
   trip: any;
-  range: FormGroup<any>;
-  startDate: FormControl<any>;
-  endDate: FormControl<any>;
   weather: any;
   isEdited: boolean = false
 
@@ -89,10 +81,6 @@ export class EditComponent implements OnInit{
           const autocomplete = new google.maps.places.Autocomplete(input, options);
           autocomplete.addListener('place_changed', () => {
             this.gplace = autocomplete?.getPlace();
-            if (this.gplace && this.gplace.formatted_address) {
-              this.address = this.gplace.formatted_address;
-              this.place = this.gplace.name
-            }
             });
       
           const mapElement = document.getElementById('map') as HTMLElement;
@@ -111,9 +99,6 @@ export class EditComponent implements OnInit{
               startdate: new Date(this.trip.startDate),
               enddate: new Date(this.trip.endDate)
             })
-
-            // this.startDate = new FormControl(new Date(this.trip.startDate))
-            // this.endDate = new FormControl(new Date(this.trip.endDate))
 
             this.updateExistingAddresses()
             console.info('>>>> COMPLETED')
@@ -143,49 +128,54 @@ export class EditComponent implements OnInit{
   }
 
   updateExistingAddresses() {
-    
-    //this.places = this.trip.places;
-    console.log(this.places[0].lat)
 
     //update map marker
     for(var i=0; i<this.places.length; ++i) {
-      this.updateMap(this.places[i].lat, this.places[i].lon)
+      this.updateMapForExistingPlace(this.places[i].lat, this.places[i].lon, this.places[i].address)
     }
   }
 
   deleteAddress(place: any) {
     const idx = this.places.indexOf(place)
     this.places.splice(idx, 1)
-    this.addresses.splice(idx, 1)
     this.markers[idx].setMap(null);
     this.markers.splice(idx, 1);
   }
 
   getCoordinates() {
-    if (this.address) {
-      this.googleMapsLoader.getCoordinates(this.address)
+    const address=this.gplace.formatted_address
+    if (address) {
+      this.googleMapsLoader.getCoordinates(address)
         .then(coordinates => {
-          this.latitude = coordinates.lat;
-          this.longitude = coordinates.lng;
           this.addressError = null;
           console.log(coordinates)
           this.updateMap(coordinates.lat, coordinates.lng);
-          this.addresses.push(this.address);
-          const place = {address: this.gplace.formatted_address, lat: this.latitude, lon: this.longitude, name: this.gplace.name, url: this.gplace.url}
+          const place = {address: this.gplace.formatted_address, lat: coordinates.lat, lon: coordinates.lng, name: this.gplace.name, url: this.gplace.url}
           this.places.push(place);
         })
         .catch(err => {
           this.addressError = err;
           console.log(this.addressError)
-          this.latitude = null;
-          this.longitude = null;
         });
+      }
+    }
+
+    updateMapForExistingPlace(lat: number, lng: number, address: string) {
+      if (this.map) {
+        const location = new google.maps.LatLng(lat, lng);
+        this.map.setCenter(location);
+        this.map.setZoom(15);
+  
+        this.markers.push(new google.maps.Marker({
+          position: location,
+          map: this.map,
+          title: address
+        }));
       }
     }
 
   updateMap(lat: number, lng: number) {
     if (this.map) {
-      console.log(lat + " " + lng)
       const location = new google.maps.LatLng(lat, lng);
       this.map.setCenter(location);
       this.map.setZoom(15);
@@ -193,30 +183,30 @@ export class EditComponent implements OnInit{
       this.markers.push(new google.maps.Marker({
         position: location,
         map: this.map,
-        title: this.address
+        title: this.gplace.formatted_address
       }));
     }
   }
 
   calculateRoute(p: any): void {
-    const directionsService = new google.maps.DirectionsService();
-    const directionsRenderer = new google.maps.DirectionsRenderer();
+    //const directionsService = new google.maps.DirectionsService();
+    //const directionsRenderer = new google.maps.DirectionsRenderer();
     console.log("im here")
     var idx = this.places.indexOf(p);
 
-    directionsRenderer.setMap(this.map);
-    directionsRenderer.setPanel(document.getElementById("sidebar") as HTMLElement);
+    this.directionsRenderer.setMap(this.map);
+    this.directionsRenderer.setPanel(document.getElementById("sidebar") as HTMLElement);
 
-    const origin = { lat: p.lat, lng: p.lon }; // Example origin (San Francisco)
-    const destination = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon }; // Example destination (Los Angeles)
+    const destination = { lat: p.lat, lng: p.lon }; 
+    const origin = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon }; 
 
-    directionsService.route(
+    this.directionsService.route(
       {
         origin: origin,
         destination: destination,
         travelMode: google.maps.TravelMode.TRANSIT
       }).then((response) => {
-        directionsRenderer.setDirections(response);
+        this.directionsRenderer.setDirections(response);
       })
       .catch((e) => window.alert("Directions request failed due to " + e.message));
   }
