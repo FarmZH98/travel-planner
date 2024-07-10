@@ -30,15 +30,7 @@ public class TravelService {
             travel.setTitle(doc.getString("title"));
             travel.setId(doc.getObjectId("_id").toHexString());
             travel.setToken(token);
-
-            // Instant instant = Instant.parse(doc.getString("startDate"));
-            // ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
-            // Date date = Date.from(zonedDateTime.toInstant());
             travel.setStartDate(doc.getDate("startDate"));
-
-            // instant = Instant.parse(doc.getString("endDate"));
-            // zonedDateTime = instant.atZone(ZoneId.systemDefault());
-            // date = Date.from(zonedDateTime.toInstant());
             travel.setEndDate(doc.getDate("endDate"));
             System.out.println("getAllTravels()" + travel.toString());
             tripsJson.add(travel.toSummaryJsonString());
@@ -61,9 +53,6 @@ public class TravelService {
         List<Place> places = placesDocs.stream()
                                .map(Place::documentToPlace)
                                .toList();
-        // List<Place> places = travelRaw.getList("places", String.class).stream()
-        //                         .map(value -> Place.jsonToPlace(value))
-        //                         .toList();
         travel.setPlaces(places);
         System.out.println(">>> getTripDetailsById()" + travel.toString());
 

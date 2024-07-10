@@ -6,6 +6,8 @@ import { Place, Travel } from '../model';
 import { TravelService } from '../services/travel.service';
 import { WeatherService } from '../services/weather.service';
 import { OllamaService } from '../services/ollama.service';
+import { Store } from '@ngrx/store';
+import { addTravel } from '../state/travel.action';
 
 
 @Component({
@@ -22,6 +24,7 @@ export class NewEntryComponent implements OnInit {
   private readonly weatherService = inject(WeatherService)
   private readonly directionsService = new google.maps.DirectionsService()
   private readonly directionsRenderer = new google.maps.DirectionsRenderer()
+  private readonly store = inject(Store)
 
   form!: FormGroup
   gplace: any;
@@ -38,6 +41,8 @@ export class NewEntryComponent implements OnInit {
   answers: any[] = [];
   questionSent: boolean = false;
   ollamaForm!: FormGroup;
+  ollamaPlaces : any[] = [];
+  ollamaMainAnswer: string = '';
   private readonly ollamaService = inject(OllamaService)
 
   ngOnInit(): void {
@@ -106,6 +111,7 @@ export class NewEntryComponent implements OnInit {
     }
     this.isCreated = true
 
+    this.store.dispatch(addTravel({travel}))
     this.travelService.createTravel(travel, this.token).then(
       (response: any) => {
         console.log(response)
@@ -140,8 +146,22 @@ export class NewEntryComponent implements OnInit {
           this.addressError = err;
           console.log(this.addressError)
         });
-      }
     }
+  }
+
+  updateMapForExistingPlace(lat: number, lng: number, address: string) {
+    if (this.map) {
+      const location = new google.maps.LatLng(lat, lng);
+      this.map.setCenter(location);
+      this.map.setZoom(15);
+
+      this.markers.push(new google.maps.Marker({
+        position: location,
+        map: this.map,
+        title: address
+      }));
+    }
+  }
 
   updateMap(lat: number, lng: number) {
     if (this.map) {
@@ -218,19 +238,50 @@ export class NewEntryComponent implements OnInit {
       console.log('User: ' + text);
       //this.messages.push({text: text, sender: 'User', timestamp: new Date()});
       this.questionSent = true;
+      this.ollamaPlaces = []
       this.ollamaService.chatWithOllama(text).then((response: any) => {
         console.log(response)
-        const answer = {by: "Ollama", message: response.answer}
+        var responseFormatted = this.filterOllamaResponse(response.answer)
+        const answer = {by: "Ollama", message: responseFormatted}
         this.answers.push(answer)
         this.questionSent = false;
       })
       .catch(err => {
         alert(err.message)
+        console.log(err);
+        this.questionSent = false;
       });
-
       this.ollamaForm.reset();
     }
   }
+
+  filterOllamaResponse(responseRaw: string) {
+    var response = JSON.parse(responseRaw.trim());
+
+    response.Places.forEach((place : any) => {
+      this.ollamaPlaces.push(place)
+    }); 
+
+    return response.Main
+  }
+
+  addOllamaPlace(ollamaPlace: any) {
+    const address=ollamaPlace.Address
+    if (address) {
+      this.googleMapsLoader.getCoordinates(address)
+        .then(coordinates => {
+          this.addressError = null;
+          console.log(coordinates)
+          this.updateMapForExistingPlace(coordinates.lat, coordinates.lng, address);
+          const place = {address: address, lat: coordinates.lat, lon: coordinates.lng, name: ollamaPlace.Place, url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
+          this.places.push(place);
+        })
+        .catch(err => {
+          this.addressError = err;
+          console.log(this.addressError)
+        });
+      }
+    }
   
 }
 

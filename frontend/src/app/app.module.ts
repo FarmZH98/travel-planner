@@ -38,6 +38,8 @@ import { WeatherService } from './services/weather.service';
 import { OllamaService } from './services/ollama.service';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { TravelStore } from './travel.store';
+import { StoreModule } from '@ngrx/store';
+import { travelReducer } from './state/travel.reducer';
 
 const appRoutes: Routes = [
   {path: '', component: LoginComponent},
@@ -79,6 +81,7 @@ const appRoutes: Routes = [
     MatTooltipModule,
     GoogleMapsModule,
     RouterModule.forRoot(appRoutes, { useHash: true }),
+    StoreModule.forRoot({ travels: travelReducer }),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),
       // Register the ServiceWorker as soon as the application is stable

@@ -26,10 +26,6 @@ public class OllamaController {
 
         try {
             String response = ollamaService.chatWithOllama(question);
-            System.out.println(response);
-
-
-
             return ResponseEntity.ok(Json.createObjectBuilder()
                                 .add("answer", response)
                                 .build().toString());

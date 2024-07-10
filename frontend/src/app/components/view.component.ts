@@ -2,8 +2,11 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Place, Travel } from '../model';
 import { TravelService } from '../services/travel.service';
-import { Subscription, from } from 'rxjs';
+import { Observable, Subscription, from } from 'rxjs';
 import { WeatherService } from '../services/weather.service';
+import { Store } from '@ngrx/store';
+import { selectTravelById } from '../state/travel.selector';
+import { addTravel } from '../state/travel.action';
 
 @Component({
   selector: 'app-view',
@@ -18,8 +21,10 @@ export class ViewComponent {
   private readonly weatherService = inject(WeatherService)
   private readonly directionsService = new google.maps.DirectionsService()
   private readonly directionsRenderer = new google.maps.DirectionsRenderer()
+  private readonly store = inject(Store)
 
   sub$!: Subscription
+  trip$: Observable<Travel>
 
   places: Place[] = [];
   addressError: string | null = null;
@@ -39,27 +44,37 @@ export class ViewComponent {
 
     //get value and input into form
     this.tripId = this.activatedRoute.snapshot.queryParams['id']
-    this.sub$ = from(this.travelService.getTravelDetail(this.token, this.tripId))
-      .subscribe({
-        next: (value : any) => {
-          console.info(value.trip)
-          this.trip = JSON.parse(value.trip)
-          this.trip.places.forEach((place: string) => {
-            this.places.push(JSON.parse(place))
-          });
+    this.trip$ = this.store.select(selectTravelById(this.tripId))
+
+      this.trip$.subscribe({
+        next: async (trip : any) => {
+          if(!trip) {
+            await this.travelService.getTravelDetail(this.token, this.tripId)
+            .then((value: any) => {
+              console.info(value.trip)
+              this.trip = JSON.parse(value.trip)
+              this.trip.places.forEach((place: string) => {
+                this.places.push(JSON.parse(place))
+              });
+              this.trip.places=this.places
+              const travel: Travel = this.trip
+              this.store.dispatch(addTravel({travel}))
+            })
+          } else {
+            this.trip = trip
+            this.places = this.trip.places
+          }
           const mapElement = document.getElementById('map') as HTMLElement;
           // add markers and focus the map on the last marker
           this.map = new google.maps.Map(mapElement, {
             center: { lat: 1.2908306, lng: 103.7764078 },
             zoom: 15
           });
+  
+          this.updateExistingAddresses()
+          console.info('>>>> COMPLETED')
         },
-        error: value => console.error('>>> ERROR promise -> observable: ', value),
-        complete: () => 
-          {
-            this.updateExistingAddresses()
-            console.info('>>>> COMPLETED')
-          }
+        error: value => console.error('>>> ERROR promise -> observable: ', value)
       })
   }
 
@@ -86,10 +101,6 @@ export class ViewComponent {
   }
 
   calculateRoute(p: any): void {
-    // const directionsService = new google.maps.DirectionsService();
-    // const directionsRenderer = new google.maps.DirectionsRenderer();
-    this.directionsRenderer.unbindAll()
-    console.log("im here")
     var idx = this.places.indexOf(p);
 
     this.directionsRenderer.setMap(this.map);
@@ -105,6 +116,7 @@ export class ViewComponent {
         travelMode: google.maps.TravelMode.TRANSIT
       }).then((response) => {
         this.directionsRenderer.setDirections(response);
+        console.log(response)
       })
       .catch((e) => window.alert("Directions request failed due to " + e.message));
   }

@@ -5,8 +5,11 @@ import { GoogleMapsLoaderService } from '../services/gmap-loader.service';
 import { Place, Travel } from '../model';
 import { TravelService } from '../services/travel.service';
 import { WeatherService } from '../services/weather.service';
-import { Subscription, from } from 'rxjs';
+import { Observable, Subscription, from } from 'rxjs';
 import { OllamaService } from '../services/ollama.service';
+import { select, Store } from '@ngrx/store';
+import { selectTravelById } from '../state/travel.selector';
+import { addTravel, deleteTravel, updateTravel } from '../state/travel.action';
 
 @Component({
   selector: 'app-edit',
@@ -22,9 +25,10 @@ export class EditComponent implements OnInit{
   private readonly weatherService = inject(WeatherService)
   private readonly directionsService = new google.maps.DirectionsService();
   private readonly directionsRenderer = new google.maps.DirectionsRenderer();
+  private readonly store = inject(Store)
 
   form!: FormGroup
-  sub$!: Subscription
+  trip$: Observable<Travel>
 
   gplace: any;
   places: Place[] = [];
@@ -40,6 +44,8 @@ export class EditComponent implements OnInit{
   answers: any[] = [];
   questionSent: boolean = false;
   ollamaForm!: FormGroup;
+  ollamaPlaces : any[] = [];
+  ollamaMainAnswer: string = '';
   private readonly ollamaService = inject(OllamaService)
 
   constructor(private fb: FormBuilder) {
@@ -62,53 +68,61 @@ export class EditComponent implements OnInit{
 
     //get value and input into form
     const travelId = this.activatedRoute.snapshot.queryParams['id']
-    this.sub$ = from(this.travelService.getTravelDetail(this.token, travelId))
-      .subscribe({
-        next: (value : any) => {
-          console.info(value.trip)
-          this.trip = JSON.parse(value.trip)
-          this.trip.places.forEach((place: string) => {
-            this.places.push(JSON.parse(place))
-          });
-          const options = {
-            //fields: ["address_components", "geometry", "icon", "name", "formatted_address"],
-            fields: ["address_components", "name", "formatted_address", "url"],
-            strictBounds: false,
-          };
-      
-          const input = document.getElementById('address') as HTMLInputElement;
-          //this.autocomplete = new google.maps.places.Autocomplete(input, options);
-          const autocomplete = new google.maps.places.Autocomplete(input, options);
-          autocomplete.addListener('place_changed', () => {
-            this.gplace = autocomplete?.getPlace();
+    this.trip$ = this.store.select(selectTravelById(travelId))
+
+    this.trip$.subscribe({
+      next: async (trip : any) => {
+        console.log(trip)
+        if(!trip) {
+          await this.travelService.getTravelDetail(this.token, travelId)
+          .then((value: any) => {
+            console.info(value.trip)
+            this.trip = JSON.parse(value.trip)
+            this.trip.places.forEach((place: string) => {
+              this.places.push(JSON.parse(place))
             });
-      
-          const mapElement = document.getElementById('map') as HTMLElement;
-          // add markers and focus the map on the last marker
-          this.map = new google.maps.Map(mapElement, {
-            center: { lat: 1.2908306, lng: 103.7764078 },
-            zoom: 15
-          });
-        },
-        error: value => console.error('>>> ERROR promise -> observable: ', value),
-        complete: () => 
-          {
-            this.form.patchValue({
-              title: this.trip.title, 
-              notes: this.trip.notes, 
-              startdate: new Date(this.trip.startDate),
-              enddate: new Date(this.trip.endDate)
-            })
+            this.trip.places=this.places
+            const travel: Travel = this.trip
+            this.store.dispatch(addTravel({travel}))
+          })
+        } else {
+          this.trip = trip
+          this.places = this.trip.places
+        }
+        const options = {
+          fields: ["address_components", "name", "formatted_address", "url"],
+          strictBounds: false,
+        };
+    
+        const input = document.getElementById('address') as HTMLInputElement;
+        //this.autocomplete = new google.maps.places.Autocomplete(input, options);
+        const autocomplete = new google.maps.places.Autocomplete(input, options);
+        autocomplete.addListener('place_changed', () => {
+          this.gplace = autocomplete?.getPlace();
+        });
+    
+        const mapElement = document.getElementById('map') as HTMLElement;
+        // add markers and focus the map on the last marker
+        this.map = new google.maps.Map(mapElement, {
+          center: { lat: 1.2908306, lng: 103.7764078 },
+          zoom: 15
+        });
+        this.form.patchValue({
+          title: this.trip.title, 
+          notes: this.trip.notes, 
+          startdate: new Date(this.trip.startDate),
+          enddate: new Date(this.trip.endDate)
+        })
 
-            this.updateExistingAddresses()
-            console.info('>>>> COMPLETED')
-        
-          }
-      })
+        this.updateExistingAddresses()
+        console.info('>>>> COMPLETED')
+      },
+      error: value => console.error('>>> ERROR promise -> observable: ', value)
+    })
 
-      this.ollamaForm = this.fb.group({
-        text: ['', [Validators.required, Validators.minLength(3)]],
-      });   
+    this.ollamaForm = this.fb.group({
+      text: ['', [Validators.required, Validators.minLength(3)]],
+    });   
   
   }
 
@@ -160,19 +174,19 @@ export class EditComponent implements OnInit{
       }
     }
 
-    updateMapForExistingPlace(lat: number, lng: number, address: string) {
-      if (this.map) {
-        const location = new google.maps.LatLng(lat, lng);
-        this.map.setCenter(location);
-        this.map.setZoom(15);
-  
-        this.markers.push(new google.maps.Marker({
-          position: location,
-          map: this.map,
-          title: address
-        }));
-      }
+  updateMapForExistingPlace(lat: number, lng: number, address: string) {
+    if (this.map) {
+      const location = new google.maps.LatLng(lat, lng);
+      this.map.setCenter(location);
+      this.map.setZoom(15);
+
+      this.markers.push(new google.maps.Marker({
+        position: location,
+        map: this.map,
+        title: address
+      }));
     }
+  }
 
   updateMap(lat: number, lng: number) {
     if (this.map) {
@@ -227,7 +241,7 @@ export class EditComponent implements OnInit{
     }
 
     this.isEdited = true
-
+    this.store.dispatch(updateTravel({travel}))
     this.travelService.updateTravelDetails(travel, this.token).then(
       (response: any) => {
         console.log(response)
@@ -241,6 +255,7 @@ export class EditComponent implements OnInit{
   }
 
   deleteTrip() {
+    this.store.dispatch(deleteTravel(this.trip.id))
     this.travelService.deleteTrip(this.token, this.trip.id).then(
       (response: any) => {
         console.log(response)
@@ -283,18 +298,48 @@ export class EditComponent implements OnInit{
       console.log('User: ' + text);
       //this.messages.push({text: text, sender: 'User', timestamp: new Date()});
       this.questionSent = true;
+      this.ollamaPlaces = []
       this.ollamaService.chatWithOllama(text).then((response: any) => {
         console.log(response)
-        const answer = {by: "Ollama", message: response.answer}
+        var responseFormatted = this.filterOllamaResponse(response.answer)
+        const answer = {by: "Ollama", message: responseFormatted}
         this.answers.push(answer)
         this.questionSent = false;
       })
       .catch(err => {
         alert(err.message)
+        console.log(err);
+        this.questionSent = false;
       });
-
       this.ollamaForm.reset();
     }
   }
 
+  filterOllamaResponse(responseRaw: string) {
+    var response = JSON.parse(responseRaw.trim());
+
+    response.Places.forEach((place : any) => {
+      this.ollamaPlaces.push(place)
+    }); 
+
+    return response.Main
+  }
+
+  addOllamaPlace(ollamaPlace: any) {
+    const address=ollamaPlace.Address
+    if (address) {
+      this.googleMapsLoader.getCoordinates(address)
+        .then(coordinates => {
+          this.addressError = null;
+          console.log(coordinates)
+          this.updateMapForExistingPlace(coordinates.lat, coordinates.lng, address);
+          const place = {address: address, lat: coordinates.lat, lon: coordinates.lng, name: ollamaPlace.Place, url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
+          this.places.push(place);
+        })
+        .catch(err => {
+          this.addressError = err;
+          console.log(this.addressError)
+        });
+      }
+    }
 }

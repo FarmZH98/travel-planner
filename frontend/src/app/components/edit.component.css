@@ -70,3 +70,9 @@ mat-form-field{
     padding: 1em;
     margin-bottom: .4em;
 }
+
+.ollama-places {
+    max-width: 70%;
+    padding: 1em;
+    margin-bottom: .4em;
+}

@@ -108,9 +108,13 @@
     
         <div class="ollama-messages" *ngFor="let a of answers">
             <span>{{a.by}}: </span>
-            <p class="ollama-wrap" matTooltip="{{ a.message }}">{{ a.message }}</p>
+            <div class="ollama-wrap" matTooltip="{{ a.message }}">{{ a.message }}</div>
         </div>
 
+        <div class="ollama-places" *ngFor="let p of ollamaPlaces">
+            <span>{{p.Place}}: {{p.Explanation}} <button type="button" (click)="addOllamaPlace(p)">Add Place</button> </span>
+        </div>
+        
         <div>
             <mat-spinner *ngIf="questionSent"></mat-spinner>
         </div>

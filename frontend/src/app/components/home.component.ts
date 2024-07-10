@@ -1,8 +1,5 @@
-import { AfterViewInit, Component, Inject, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, } from '@angular/core';
 import { Router } from '@angular/router';
-import { firstValueFrom, Subject, Subscription } from 'rxjs';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { FormRepository } from '../repo/form.repository';
 import { TravelService } from '../services/travel.service';
 
 
