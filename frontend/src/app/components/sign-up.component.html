@@ -63,7 +63,7 @@
                         <mat-radio-button *ngFor="let g of genders" value="{{g}}">{{g}}</mat-radio-button> 
                     </mat-radio-group>
                 </div>
-                <button type="submit" [disabled]="form.invalid">Sign Up</button>
+                <button type="submit" class="signup-button" mat-stroked-button [disabled]="form.invalid">Sign Up</button>
             </form>
         </div>
     </body>

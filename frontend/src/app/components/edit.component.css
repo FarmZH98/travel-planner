@@ -26,38 +26,72 @@
     justify-content: space-between;
 }
 
-mat-form-field{
-    width: 500px
+body {
+    overflow-y: hidden;
+}
+
+mat-form-field {
+    width: 500px;
 }
 
 #address {
-    width: 500px
+    width: 500px;
+}
+
+.content-container {
+    display: flex;
+    height: calc(100vh - 64px); /* 64px is the height of the toolbar */
+}
+
+.content {
+    flex: 3;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.submit {
+    border: 2px solid black;
+    background-color: #ac73ff;
+}
+
+.delete {
+    border: 2px solid black;
+    background-color: #D1D7E0;
 }
 
 .ollama-container {
-    margin: 0 auto;
+    flex: 1;
     display: flex;
     flex-direction: column;
+    max-width: 600px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-left: 1px solid #ccc;
+}
+
+.toggle-ollama {
+    top: 10px;
+    right: 10px;
 }
 
 .ollama-header {
     padding: 5px;
-    background: rgb(113, 40, 230);
+    background: #2D283E;
+    color: white;
+    border-radius: 2%;
 }
 
 .ollama-messages {
-    padding-top: 10px;
+    padding: 10px;
 }
 
 .ollama-input {
     width: 100%;
-    padding-top: 10px;
-    background: white;
-    left: 20%;
+    padding: 10px;
 }
 
 #ollamaForm button {
-    width: 8%;
+    width: 60px;
     padding: 5px;
     margin-left: 1%;
 }

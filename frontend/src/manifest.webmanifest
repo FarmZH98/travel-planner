@@ -54,6 +54,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
+    },
+    {
+      "src": "assets/icons/ollama.png",
+      "sizes": "720*720",
+      "type": "image/png",
+      "purpose": "maskable any"
     }
   ]
 }

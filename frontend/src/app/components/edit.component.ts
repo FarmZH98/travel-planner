@@ -10,11 +10,20 @@ import { OllamaService } from '../services/ollama.service';
 import { select, Store } from '@ngrx/store';
 import { selectTravelById } from '../state/travel.selector';
 import { addTravel, deleteTravel, updateTravel } from '../state/travel.action';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-edit',
   templateUrl: './edit.component.html',
-  styleUrl: './edit.component.css'
+  styleUrl: './edit.component.css',
+  animations: [
+    trigger('slideInOut', [
+      state('in', style({ transform: 'translateX(0)' })),
+      state('out', style({ transform: 'translateX(100%)' })),
+      transition('in => out', animate('300ms ease-in-out')),
+      transition('out => in', animate('300ms ease-in-out'))
+    ])
+  ]
 })
 export class EditComponent implements OnInit{
   //private readonly fb = inject(FormBuilder)
@@ -46,6 +55,7 @@ export class EditComponent implements OnInit{
   ollamaForm!: FormGroup;
   ollamaPlaces : any[] = [];
   ollamaMainAnswer: string = '';
+  ollamaVisible = false;
   private readonly ollamaService = inject(OllamaService)
 
   constructor(private fb: FormBuilder) {
@@ -340,6 +350,10 @@ export class EditComponent implements OnInit{
           this.addressError = err;
           console.log(this.addressError)
         });
-      }
     }
+  }
+  
+  toggleOllama() {
+    this.ollamaVisible = !this.ollamaVisible;
+  }
 }

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Entry</title>
-    <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script> -->
 </head>
 <body>
     <mat-toolbar color="primary">
@@ -14,128 +13,130 @@
         </mat-toolbar-row>
     </mat-toolbar>
 
-    <mat-divider></mat-divider>
-    <div class="content">
-        
-        
-        <form [formGroup]="form" (ngSubmit)="create()">
-            
-            <div>
-                <mat-form-field>
-                    <mat-label>Title: </mat-label>
-                    <input matInput placeholder="Title" formControlName="title">
-                </mat-form-field>
-            </div>
-            <div>
-                <mat-form-field>
-                    <mat-label>Notes: </mat-label>
-                    <textarea matInput placeholder="Notes" formControlName="notes"></textarea>
-                </mat-form-field>
-            </div>
-            <div>
-                <mat-form-field>
-                    <mat-label>Enter a date range</mat-label>
-                    <mat-date-range-input [rangePicker]="picker">
-                      <input formControlName="startdate" matStartDate placeholder="Start date">
-                      <input formControlName="enddate" matEndDate placeholder="End date">
-                    </mat-date-range-input>
-                    <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
-                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                    <mat-date-range-picker #picker></mat-date-range-picker>
-                    <div *ngIf="form.errors?.['dateRange']">
-                        <mat-error>
-                            The app currently only supports a maximum of 5 days
-                        </mat-error>
-                      </div>
-                  </mat-form-field>
-            </div>
-            <br>
-            <div class="addressEntry">
-                <p>Add places to visit:</p>
-                <input id="address" placeholder="Enter address" />
-                <button type="button" (click)="getCoordinates()">Add</button>
-            
-                <div *ngIf="addressError">
-                <p>Error: {{ addressError }}</p>
+    <div class="content-container">
+        <div class="content">
+            <form [formGroup]="form" (ngSubmit)="create()">
+                <div>
+                    <mat-form-field>
+                        <mat-label>Title: </mat-label>
+                        <input matInput placeholder="Title" formControlName="title">
+                    </mat-form-field>
                 </div>
-            </div>
-            <br>
-            <div id="map-container">
-                <div class="my-google-map" id="map">
-                    <google-map>
-                    </google-map>
+                <div>
+                    <mat-form-field>
+                        <mat-label>Notes: </mat-label>
+                        <textarea matInput placeholder="Notes" formControlName="notes"></textarea>
+                    </mat-form-field>
                 </div>
-                <div id="sidebar"></div>
-            </div>
-            
+                <div>
+                    <mat-form-field>
+                        <mat-label>Enter a date range</mat-label>
+                        <mat-date-range-input [rangePicker]="picker">
+                          <input formControlName="startdate" matStartDate placeholder="Start date">
+                          <input formControlName="enddate" matEndDate placeholder="End date">
+                        </mat-date-range-input>
+                        <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-date-range-picker #picker></mat-date-range-picker>
+                        <div *ngIf="form.errors?.['dateRange']">
+                            <mat-error>
+                                The app currently only supports a maximum of 5 days
+                            </mat-error>
+                          </div>
+                      </mat-form-field>
+                </div>
+                <br>
+                <div class="addressEntry">
+                    <p>Add places to visit:</p>
+                    <input id="address" placeholder="Enter address" />
+                    <button type="button" (click)="getCoordinates()">Add</button>
+                
+                    <div *ngIf="addressError">
+                    <p>Error: {{ addressError }}</p>
+                    </div>
+                </div>
+                <br>
+                <div id="map-container">
+                    <div class="my-google-map" id="map">
+                        <google-map>
+                        </google-map>
+                    </div>
+                    <div id="sidebar"></div>
+                </div>
+                
 
-            <div>
-                <mat-divider></mat-divider>
-                <mat-list>
-                    <h3><strong>Places to visit</strong></h3>
-                    <!-- <p>Select main mode of transport: </p> -->
-                    <mat-list-item *ngFor="let p of places">
-                        <a href="{{p.url}}" target="_blank">{{p.name}} </a> : {{p.address}}
-                        <button type="button" mat-icon-button (click)="deleteAddress(p)">
-                            <mat-icon>delete</mat-icon>
-                        </button>
-                        <button type="button" mat-icon-button (click)="getWeather(p)">
-                            <mat-icon>wb_sunny</mat-icon>
-                        </button>
-                        <button type="button" mat-icon-button (click)="calculateRoute(p)" *ngIf="this.isRouteVisible(p)">
-                            <mat-icon> directions</mat-icon>
-                        </button>
-                    </mat-list-item>
-                </mat-list>
-            </div>
+                <div>
+                    <mat-divider></mat-divider>
+                    <mat-list>
+                        <h3><strong>Places to visit</strong></h3>
+                        <!-- <p>Select main mode of transport: </p> -->
+                        <mat-list-item *ngFor="let p of places">
+                            <a href="{{p.url}}" target="_blank">{{p.name}} </a> : {{p.address}}
+                            <button type="button" title="delete" mat-icon-button (click)="deleteAddress(p)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                            <button type="button" title="weather" mat-icon-button (click)="getWeather(p)">
+                                <mat-icon>wb_sunny</mat-icon>
+                            </button>
+                            <button type="button" title="public transit directions" mat-icon-button (click)="calculateRoute(p)" *ngIf="this.isRouteVisible(p)">
+                                <mat-icon> directions</mat-icon>
+                            </button>
+                        </mat-list-item>
+                    </mat-list>
+                </div>
 
-            <button type="submit" [disabled]="form.invalid">Create</button>
-        </form>
+                
+                <div class="weatherbox">
+                    @if (weather) {
+                        <p><strong>Weather:</strong></p> 
+                        <img src="http://openweathermap.org/img/w/{{weather.icon}}.png"> 
+                        {{weather.description}} - {{weather.city}}
+                    }
+                    
+                </div>
 
-        <div class="weatherbox">
-            @if (weather) {
-                <p><strong>Weather:</strong></p> 
-                <img src="http://openweathermap.org/img/w/{{weather.icon}}.png"> 
-                {{weather.description}} - {{weather.city}}
-            }
-            
-        </div>
-    </div>
-    <br>
-    <div class="ollama-container">
-        <div class="ollama-header">
-            <h2 class="ollama-title">Ollama Chat App</h2>
-        </div>
-    
-        <div class="ollama-tip">
-            <p><i>Chat with our AI bot to help plan your travels!</i></p>
-        </div>
-    
-        <div class="ollama-messages" *ngFor="let a of answers">
-            <span>{{a.by}}: </span>
-            <div class="ollama-wrap" matTooltip="{{ a.message }}">{{ a.message }}</div>
-        </div>
-
-        <div class="ollama-places" *ngFor="let p of ollamaPlaces">
-            <span>{{p.Place}}: {{p.Explanation}} <button type="button" (click)="addOllamaPlace(p)">Add Place</button> </span>
-        </div>
-        
-        <div>
-            <mat-spinner *ngIf="questionSent"></mat-spinner>
-        </div>
-    
-        <div class="ollama-input">
-            <form [formGroup]="ollamaForm" id="ollamaForm" (ngSubmit)="sendMessage()">
-                <mat-form-field class="example-full-width" appearance="fill">
-                    <input matInput formControlName="text" placeholder="Type a message">
-                    <mat-error *ngIf="ollamaForm?.get('text')?.invalid">Message is required</mat-error>
-                </mat-form-field>
-                <button mat-fab extended color="primary" type="submit" [disabled]="questionSent">
-                    <mat-icon>send</mat-icon>
-                </button>
+                <button class="submit" type="submit" mat-stroked-button [disabled]="form.invalid">Create</button>
             </form>
         </div>
-    
+
+        <button type="button" title="Chat with Ollama AI" class="toggle-ollama" mat-button (click)="toggleOllama()">
+            <img src="assets/icons/ollama.png" alt="ollama" style="height: 30px;">
+        </button>
+        <div class="ollama-container" *ngIf="ollamaVisible" [@slideInOut]>
+            <div class="ollama-header">
+                <h2 class="ollama-title">Ollama Chat App  </h2>
+            </div>
+        
+            <div class="ollama-tip">
+                <p><i>Chat with our AI bot to help plan your travels!</i></p>
+            </div>
+        
+            <div class="ollama-messages" *ngFor="let a of answers">
+                <span>{{a.by}}: </span>
+                <div class="ollama-wrap" matTooltip="{{ a.message }}">{{ a.message }}</div>
+            </div>
+
+            <div class="ollama-places" *ngFor="let p of ollamaPlaces">
+                <span>{{p.Place}}: {{p.Explanation}} <button type="button" (click)="addOllamaPlace(p)">Add Place</button> </span>
+            </div>
+            
+            <div>
+                <mat-spinner *ngIf="questionSent"></mat-spinner>
+            </div>
+        
+            <div class="ollama-input">
+                <form [formGroup]="ollamaForm" id="ollamaForm" (ngSubmit)="sendMessage()">
+                    <mat-form-field class="example-full-width" appearance="fill">
+                        <input matInput formControlName="text" placeholder="Type a message">
+                        <mat-error *ngIf="ollamaForm?.get('text')?.invalid">Message is required</mat-error>
+                    </mat-form-field>
+                    <button mat-fab extended color="primary" type="submit" [disabled]="questionSent">
+                        <mat-icon>send</mat-icon>
+                    </button>
+                </form>
+            </div>
+        
+        </div>
     </div>
 </body>
 </html>

@@ -8,12 +8,21 @@ import { WeatherService } from '../services/weather.service';
 import { OllamaService } from '../services/ollama.service';
 import { Store } from '@ngrx/store';
 import { addTravel } from '../state/travel.action';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 
 
 @Component({
   selector: 'app-new-entry',
   templateUrl: './new-entry.component.html',
-  styleUrl: './new-entry.component.css'
+  styleUrl: './new-entry.component.css',
+  animations: [
+    trigger('slideInOut', [
+      state('in', style({ transform: 'translateX(0)' })),
+      state('out', style({ transform: 'translateX(100%)' })),
+      transition('in => out', animate('300ms ease-in-out')),
+      transition('out => in', animate('300ms ease-in-out'))
+    ])
+  ]
 })
 export class NewEntryComponent implements OnInit {
 
@@ -43,6 +52,7 @@ export class NewEntryComponent implements OnInit {
   ollamaForm!: FormGroup;
   ollamaPlaces : any[] = [];
   ollamaMainAnswer: string = '';
+  ollamaVisible = false;
   private readonly ollamaService = inject(OllamaService)
 
   ngOnInit(): void {
@@ -281,6 +291,10 @@ export class NewEntryComponent implements OnInit {
           console.log(this.addressError)
         });
       }
+    }
+    
+    toggleOllama() {
+      this.ollamaVisible = !this.ollamaVisible;
     }
   
 }
