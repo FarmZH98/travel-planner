@@ -48,7 +48,6 @@ export class ViewComponent {
       transportMode: this.fb.control<string>('TRANSIT', [ Validators.required ])
     })
 
-    //get value and input into form
     this.tripId = this.activatedRoute.snapshot.queryParams['id']
     this.trip$ = this.store.select(selectTravelById(this.tripId))
 
@@ -148,15 +147,14 @@ export class ViewComponent {
     });
   }
 
-
   async sendEmail() {
 
     var placeEmails: PlaceEmail[] = []
 
     for(var i=0; i<this.places.length; ++i) {
-
       var placeEmail: PlaceEmail
-
+      
+      //get weather
       await this.weatherService.getWeather(this.places[i].lat, this.places[i].lon)
         .then(
           (response: any) => {
@@ -172,6 +170,7 @@ export class ViewComponent {
         continue
       }
 
+      //get route
       const destination = { lat: this.places[i].lat, lng: this.places[i].lon }; 
       const origin = { lat: this.places[i-1].lat, lng: this.places[i-1].lon };
       const selectedMode = this.form.value.transportMode as keyof typeof google.maps.TravelMode; 

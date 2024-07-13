@@ -225,7 +225,6 @@ export class EditComponent implements OnInit{
     return true
   }
 
-
   update() {
     const travel: Travel = {
       places: this.places,
