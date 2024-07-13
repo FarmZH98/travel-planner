@@ -69,7 +69,13 @@
                     <mat-divider></mat-divider>
                     <mat-list>
                         <h3><strong>Places to visit</strong></h3>
-                        <!-- <p>Select main mode of transport: </p> -->
+                        <p>Select main mode of transport: </p>
+                        <mat-radio-group formControlName="transportMode">
+                            <mat-radio-button value="TRANSIT">Public Transit</mat-radio-button>
+                            <mat-radio-button value="BICYCLING">Bicycling</mat-radio-button>
+                            <mat-radio-button value="DRIVING">Driving</mat-radio-button>
+                            <mat-radio-button value="WALKING">Walking</mat-radio-button>
+                        </mat-radio-group>
                         <mat-list-item *ngFor="let p of places">
                             <a href="{{p.url}}" target="_blank">{{p.name}} </a> : {{p.address}}
                             <button type="button" title="delete" mat-icon-button (click)="deleteAddress(p)">

@@ -64,8 +64,9 @@ export class EditComponent implements OnInit{
       notes: this.fb.control<string>(""),
       startdate: this.fb.control<string>("", [Validators.required]),
       enddate: this.fb.control<string>("", [Validators.required]),
+      transportMode: this.fb.control<string>('TRANSIT', [ Validators.required ])
     }, {
-      validator: this.dateRangeValidator
+      //validator: this.dateRangeValidator
     });
   }
 
@@ -105,7 +106,6 @@ export class EditComponent implements OnInit{
         };
     
         const input = document.getElementById('address') as HTMLInputElement;
-        //this.autocomplete = new google.maps.places.Autocomplete(input, options);
         const autocomplete = new google.maps.places.Autocomplete(input, options);
         autocomplete.addListener('place_changed', () => {
           this.gplace = autocomplete?.getPlace();
@@ -136,23 +136,7 @@ export class EditComponent implements OnInit{
   
   }
 
-  dateRangeValidator(control: AbstractControl): { [key: string]: any } | null {
-    const start = control.get('startdate')?.value;
-    const end = control.get('enddate')?.value;
-    if (start && end) {
-      const startDate = new Date(start);
-      const endDate = new Date(end);
-      const timeDiff = endDate.getTime() - startDate.getTime();
-      const dayDiff = timeDiff / (1000 * 3600 * 24) + 1; 
-      if (dayDiff > 5) {
-        return { 'dateRange': 'The app currently only supports a maximum of 5 days' };
-      }
-    }
-    return null;
-  }
-
   updateExistingAddresses() {
-
     //update map marker
     for(var i=0; i<this.places.length; ++i) {
       this.updateMapForExistingPlace(this.places[i].lat, this.places[i].lon, this.places[i].address)
@@ -176,6 +160,7 @@ export class EditComponent implements OnInit{
           this.updateMap(coordinates.lat, coordinates.lng);
           const place = {address: this.gplace.formatted_address, lat: coordinates.lat, lon: coordinates.lng, name: this.gplace.name, url: this.gplace.url}
           this.places.push(place);
+          this.form.markAsDirty();
         })
         .catch(err => {
           this.addressError = err;
@@ -213,9 +198,6 @@ export class EditComponent implements OnInit{
   }
 
   calculateRoute(p: any): void {
-    //const directionsService = new google.maps.DirectionsService();
-    //const directionsRenderer = new google.maps.DirectionsRenderer();
-    console.log("im here")
     var idx = this.places.indexOf(p);
 
     this.directionsRenderer.setMap(this.map);
@@ -223,12 +205,13 @@ export class EditComponent implements OnInit{
 
     const destination = { lat: p.lat, lng: p.lon }; 
     const origin = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon }; 
+    const selectedMode = this.form.value.transportMode as keyof typeof google.maps.TravelMode;
 
     this.directionsService.route(
       {
         origin: origin,
         destination: destination,
-        travelMode: google.maps.TravelMode.TRANSIT
+        travelMode: google.maps.TravelMode[selectedMode]
       }).then((response) => {
         this.directionsRenderer.setDirections(response);
       })

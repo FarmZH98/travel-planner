@@ -2,11 +2,12 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Place, Travel } from '../model';
 import { TravelService } from '../services/travel.service';
-import { Observable, Subscription, from } from 'rxjs';
+import { Observable } from 'rxjs';
 import { WeatherService } from '../services/weather.service';
 import { Store } from '@ngrx/store';
 import { selectTravelById } from '../state/travel.selector';
 import { addTravel } from '../state/travel.action';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-view',
@@ -22,8 +23,8 @@ export class ViewComponent {
   private readonly directionsService = new google.maps.DirectionsService()
   private readonly directionsRenderer = new google.maps.DirectionsRenderer()
   private readonly store = inject(Store)
+  private readonly fb = inject(FormBuilder)
 
-  sub$!: Subscription
   trip$: Observable<Travel>
 
   places: Place[] = [];
@@ -34,6 +35,7 @@ export class ViewComponent {
   token: string = ''
   tripId: string = ''
   weather: any;
+  form!: FormGroup
 
   async ngOnInit(){
     //check for token
@@ -41,6 +43,10 @@ export class ViewComponent {
     if(localStorage.getItem('token') == null) {
       this.router.navigate(['/'])
     } 
+
+    this.form = this.fb.group({
+      transportMode: this.fb.control<string>('TRANSIT', [ Validators.required ])
+    })
 
     //get value and input into form
     this.tripId = this.activatedRoute.snapshot.queryParams['id']
@@ -100,7 +106,7 @@ export class ViewComponent {
     }
   }
 
-  calculateRoute(p: any): void {
+  calculateRoute(p: any) {
     var idx = this.places.indexOf(p);
 
     this.directionsRenderer.setMap(this.map);
@@ -108,12 +114,13 @@ export class ViewComponent {
 
     const destination = { lat: p.lat, lng: p.lon }; 
     const origin = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon }; 
+    const selectedMode = this.form.value.transportMode as keyof typeof google.maps.TravelMode; 
 
     this.directionsService.route(
       {
         origin: origin,
         destination: destination,
-        travelMode: google.maps.TravelMode.TRANSIT
+        travelMode: google.maps.TravelMode[selectedMode]
       }).then((response) => {
         this.directionsRenderer.setDirections(response);
         console.log(response)

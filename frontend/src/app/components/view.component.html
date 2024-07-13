@@ -18,14 +18,23 @@
     <div class="content">
         <mat-card style="background-color: transparent;" *ngIf="trip">
             <mat-card-header>
-              <mat-card-title>{{ trip.title }}</mat-card-title>
+              <h2><strong>{{ trip.title }}</strong></h2>
             </mat-card-header>
 
             <mat-card-content>
-              <p><strong>Notes:</strong> {{ trip.notes }}</p>
-              <p><strong>Start Date:</strong> {{ trip.startDate | date }}</p>
-              <p><strong>End Date:</strong> {{ trip.endDate | date }}</p>
-              <p><strong>Places:</strong></p>
+              <h3><strong>Notes:</strong> {{ trip.notes }}</h3>
+              <h3><strong>Start Date:</strong> {{ trip.startDate | date }}</h3>
+              <h3><strong>End Date:</strong> {{ trip.endDate | date }}</h3>
+              <h3><strong>Places to visit:</strong></h3>
+              <p>Select main mode of transport: </p>
+              <form [formGroup]="form" >
+                <mat-radio-group formControlName="transportMode">
+                    <mat-radio-button value="TRANSIT">Public Transit</mat-radio-button>
+                    <mat-radio-button value="BICYCLING">Bicycling</mat-radio-button>
+                    <mat-radio-button value="DRIVING">Driving</mat-radio-button>
+                    <mat-radio-button value="WALKING">Walking</mat-radio-button>
+                </mat-radio-group>
+              </form>
               <p>
                 <mat-list-item *ngFor="let p of places">
                     <a href="{{p.url}}" target="_blank">{{p.name}} </a> : {{p.address}}
