@@ -10,6 +10,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import sg.edu.nus.iss.backend.model.EmailInfo;
 import sg.edu.nus.iss.backend.model.Travel;
 import sg.edu.nus.iss.backend.model.User;
 
@@ -31,14 +32,14 @@ public class EmailService {
     @Value("${spring.mail.username}")
    private String emailSender;
 
-    public String sendEmail(String token, String id) throws MessagingException {
+    public String sendEmail(String token, EmailInfo emailInfo) throws MessagingException {
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
         User user = loginService.getUserDetails(token);
 
-        Travel travel = travelService.getTripDetailsById(token, id);
+        Travel travel = travelService.getTripDetailsById(token, emailInfo.getTripId());
 
         Context context = new Context();
         context.setVariable("name", user.getFirstname() + " " + user.getLastname());
@@ -47,6 +48,8 @@ public class EmailService {
         context.setVariable("places", travel.getPlaces());
         context.setVariable("startDate", travel.getStartDateFormatted());
         context.setVariable("endDate", travel.getEndDateFormatted());
+        context.setVariable("placesDetail", emailInfo.getPlacesEmail());
+        context.setVariable("transportMode", emailInfo.getTransportMode());
 
         String htmlContent = templateEngine.process("emailTemplate", context);
 
@@ -58,16 +61,10 @@ public class EmailService {
         mailSender.send(message);
 
         return "Email sent successfully to " + user.getEmail();
-        // MimeMessage message = mailSender.createMimeMessage();
-        // MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-        
-
-        // helper.setTo(to);
-        // helper.setSubject(subject);
-        // helper.setText(htmlContent, true);
-        // helper.setFrom("your-email@gmail.com");
-
-        // mailSender.send(message);
     }
+
+    // private List<Route> convertToRoute(String routesJson) {
+
+
+    // }
 }

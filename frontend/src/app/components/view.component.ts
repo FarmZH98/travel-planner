@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Place, Travel } from '../model';
+import { PlaceEmail, EmailInfo, Place, Travel } from '../model';
 import { TravelService } from '../services/travel.service';
 import { Observable } from 'rxjs';
 import { WeatherService } from '../services/weather.service';
@@ -52,36 +52,36 @@ export class ViewComponent {
     this.tripId = this.activatedRoute.snapshot.queryParams['id']
     this.trip$ = this.store.select(selectTravelById(this.tripId))
 
-      this.trip$.subscribe({
-        next: async (trip : any) => {
-          if(!trip) {
-            await this.travelService.getTravelDetail(this.token, this.tripId)
-            .then((value: any) => {
-              console.info(value.trip)
-              this.trip = JSON.parse(value.trip)
-              this.trip.places.forEach((place: string) => {
-                this.places.push(JSON.parse(place))
-              });
-              this.trip.places=this.places
-              const travel: Travel = this.trip
-              this.store.dispatch(addTravel({travel}))
-            })
-          } else {
-            this.trip = trip
-            this.places = this.trip.places
-          }
-          const mapElement = document.getElementById('map') as HTMLElement;
-          // add markers and focus the map on the last marker
-          this.map = new google.maps.Map(mapElement, {
-            center: { lat: 1.2908306, lng: 103.7764078 },
-            zoom: 15
-          });
-  
-          this.updateExistingAddresses()
-          console.info('>>>> COMPLETED')
-        },
-        error: value => console.error('>>> ERROR promise -> observable: ', value)
-      })
+    this.trip$.subscribe({
+      next: async (trip : any) => {
+        if(!trip) {
+          await this.travelService.getTravelDetail(this.token, this.tripId)
+          .then((value: any) => {
+            console.info(value.trip)
+            this.trip = JSON.parse(value.trip)
+            this.trip.places.forEach((place: string) => {
+              this.places.push(JSON.parse(place))
+            });
+            this.trip.places=this.places
+            const travel: Travel = this.trip
+            this.store.dispatch(addTravel({travel}))
+          })
+        } else {
+          this.trip = trip
+          this.places = this.trip.places
+        }
+        const mapElement = document.getElementById('map') as HTMLElement;
+        // add markers and focus the map on the last marker
+        this.map = new google.maps.Map(mapElement, {
+          center: { lat: 1.2908306, lng: 103.7764078 },
+          zoom: 15
+        });
+
+        this.updateExistingAddresses()
+        console.info('>>>> COMPLETED')
+      },
+      error: value => console.error('>>> ERROR promise -> observable: ', value)
+    })
   }
 
   updateExistingAddresses() {
@@ -113,7 +113,7 @@ export class ViewComponent {
     this.directionsRenderer.setPanel(document.getElementById("sidebar") as HTMLElement);
 
     const destination = { lat: p.lat, lng: p.lon }; 
-    const origin = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon }; 
+    const origin = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon };
     const selectedMode = this.form.value.transportMode as keyof typeof google.maps.TravelMode; 
 
     this.directionsService.route(
@@ -149,8 +149,49 @@ export class ViewComponent {
   }
 
 
-  sendEmail() {
-    this.travelService.sendTripEmail(this.token, this.tripId)
+  async sendEmail() {
+
+    var placeEmails: PlaceEmail[] = []
+
+    for(var i=0; i<this.places.length; ++i) {
+
+      var placeEmail: PlaceEmail
+
+      await this.weatherService.getWeather(this.places[i].lat, this.places[i].lon)
+        .then(
+          (response: any) => {
+            placeEmail = {weather: response.description, weatherCity: response.city, weatherIcon: response.icon, dist: "", duration: ""}
+          }
+        ).catch(error => {
+          //alert(error.message)
+          console.log(error)
+        });
+
+      if(i==0) {
+        placeEmails.push(placeEmail)
+        continue
+      }
+
+      const destination = { lat: this.places[i].lat, lng: this.places[i].lon }; 
+      const origin = { lat: this.places[i-1].lat, lng: this.places[i-1].lon };
+      const selectedMode = this.form.value.transportMode as keyof typeof google.maps.TravelMode; 
+  
+      await this.directionsService.route(
+        {
+          origin: origin,
+          destination: destination,
+          travelMode: google.maps.TravelMode[selectedMode]
+        }).then((response) => {
+          placeEmail.dist = response.routes[0].legs[0].distance.text
+          placeEmail.duration = response.routes[0].legs[0].duration.text
+        })
+        .catch((e) => window.alert("Directions request failed due to " + e.message));
+
+      placeEmails.push(placeEmail)
+    }
+
+    const emailInfos: EmailInfo = {tripId: this.tripId, transportMode: this.form.value.transportMode, placesEmail: placeEmails}
+    this.travelService.sendTripEmail(this.token, emailInfos)
     .then((response : any) => {
       alert(response.response)
     }).catch(err => {

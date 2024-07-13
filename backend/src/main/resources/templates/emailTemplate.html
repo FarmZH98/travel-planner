@@ -11,9 +11,6 @@
             margin: 0;
             padding: 20px;
         }
-        h1 {
-            color: #5802d8;
-        }
         p {
             margin: 10px 0;
             font-size: 14px;
@@ -22,7 +19,7 @@
             border: 1px solid #ddd;
             padding: 20px;
             border-radius: 5px;
-            background-color: #f9f9f9;
+            background-color: beige;
         }
         .places-list {
             list-style: none;
@@ -41,7 +38,7 @@
 </head>
 <body>
     <h1>Dear [[${name}]],</h1>
-    <p>Here are the details of your trip:</p>
+    <h3>Here are the details of your trip:</h3>
     <div class="trip-details">
         <p><strong>Title:</strong> [[${title}]]</p>
         <p><strong>Notes:</strong> [[${notes}]]</p>
@@ -50,16 +47,27 @@
         <p><strong>Places:</strong></p>
         <ul class="places-list">
             <!-- Iterate through the places list -->
-            <li th:each="place : ${places}">
+            <li th:each="place, placeStat : ${places}">
                 <p><strong>Name:</strong> <span th:text="${place.name}"></span></p>
                 <p><strong>Address:</strong> <span th:text="${place.address}"></span></p>
                 <p><a th:href="${place.url}" target="_blank">View on Google Maps</a></p>
+                
+                <p>Weather: </p> 
+                <p>
+                    <img th:src="'http://openweathermap.org/img/w/' + ${placesDetail[placeStat.index].weatherIcon} + '.png'">  
+                    <span th:text="${placesDetail[placeStat.index]['weather']}"></span> - <span th:text="${placesDetail[placeStat.index]['weatherCity']}"></span>
+                </p>
+
+                <p><strong>Distance from previous location:</strong> <span th:text="${placesDetail[placeStat.index]['dist']}"></span></p>
+                <p><strong>Duration:</strong> <span th:text="${placesDetail[placeStat.index]['duration']}"></span></p>
                 <br>
             </li>
         </ul>
+
+        <p>Note: The transport mode used to calculate duration is  [[${transportMode}]]</p>
     </div>
     <div class="footer">
-        <p>Best regards,<br>Travela</p>
+        <h3>Best regards,<br>Travela</h3>
     </div>
 </body>
 </html>

@@ -2,7 +2,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable, inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
-import { Travel } from "../model";
+import { EmailInfo, Travel } from "../model";
 
 @Injectable()
 export class TravelService {
@@ -51,9 +51,9 @@ export class TravelService {
         return firstValueFrom(this.http.delete<Object>(`/api/travel/${id}`, { headers }))
     }
 
-    sendTripEmail(token: string, id: string) {
+    sendTripEmail(token: string, emailInfos: EmailInfo) {
         const headers = new HttpHeaders().set('token', token)
 
-        return firstValueFrom(this.http.get<Object>(`/api/travel/sendEmail/${id}`, { headers }))
+        return firstValueFrom(this.http.post<Object>('/api/travel/sendEmail', emailInfos, { headers }));
     }
 }

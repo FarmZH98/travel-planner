@@ -22,6 +22,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
+import sg.edu.nus.iss.backend.model.EmailInfo;
 import sg.edu.nus.iss.backend.model.Place;
 import sg.edu.nus.iss.backend.model.Travel;
 import sg.edu.nus.iss.backend.service.EmailService;
@@ -177,8 +178,9 @@ public class TravelController {
         }
     }
 
-    @GetMapping("/sendEmail/{id}")
-    public ResponseEntity<String> sendEmail(@RequestHeader String token, @PathVariable String id) {
+    @PostMapping("/sendEmail")
+    public ResponseEntity<?> sendTripEmail(@RequestHeader("token") String token,
+    @RequestBody EmailInfo emailInfo) {
     
         //check token
         if(!loginService.checkToken(token)) {
@@ -188,8 +190,12 @@ public class TravelController {
         }
 
         try {
+            // String id = emailInfo.getTripId();
+            // List<PlaceEmail> placeEmails = emailInfo.getPlacesEmail();
+            System.out.println(">>>>>> emailInfo: " + emailInfo.getPlacesEmail().toString());
+
             //get user and trip details
-            String response = emailService.sendEmail(token, id);
+            String response = emailService.sendEmail(token, emailInfo);
             
             //return travel details + firstname
             return ResponseEntity.ok(

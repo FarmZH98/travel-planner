@@ -40,3 +40,17 @@ export interface WeatherData {
 export interface TravelsSlice {
     trips: Travel[]
 }
+
+export interface PlaceEmail {
+    weather: string
+    weatherCity: string
+    weatherIcon: string
+    dist: string
+    duration: string 
+}
+
+export interface EmailInfo {
+    tripId: string
+    transportMode: string
+    placesEmail: PlaceEmail[]
+}
