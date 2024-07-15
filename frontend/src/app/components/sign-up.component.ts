@@ -20,8 +20,8 @@ export class SignUpComponent implements OnInit {
   token = "";
 
   form!: FormGroup
-  genders: string[] = ['Male', 'Female' , 'Other']; 
-  hide = signal(true);
+  genders: string[] = ['Male', 'Female' , 'Other']
+  hide = signal(true)
   isPasswordVisible = false
 
   ngOnInit(): void {

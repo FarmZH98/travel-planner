@@ -28,8 +28,8 @@ export class ViewComponent {
   trip$: Observable<Travel>
 
   places: Place[] = [];
-  addressError: string | null = null;
-  map: google.maps.Map | null = null;
+  addressError: string | null = null
+  map: google.maps.Map | null = null
   markers: any[] = [];
   trip: any;
   token: string = ''
@@ -39,7 +39,7 @@ export class ViewComponent {
 
   async ngOnInit(){
     //check for token
-    this.token = localStorage.getItem('token');
+    this.token = localStorage.getItem('token')
     if(localStorage.getItem('token') == null) {
       this.router.navigate(['/'])
     } 
@@ -93,10 +93,9 @@ export class ViewComponent {
 
   updateMap(lat: number, lng: number, address: string) {
     if (this.map) {
-      const location = new google.maps.LatLng(lat, lng);
-      this.map.setCenter(location);
-      this.map.setZoom(15);
-
+      const location = new google.maps.LatLng(lat, lng)
+      this.map.setCenter(location)
+      this.map.setZoom(15)
       new google.maps.Marker({
         position: location,
         map: this.map,
@@ -106,14 +105,14 @@ export class ViewComponent {
   }
 
   calculateRoute(p: any) {
-    var idx = this.places.indexOf(p);
+    var idx = this.places.indexOf(p)
 
-    this.directionsRenderer.setMap(this.map);
-    this.directionsRenderer.setPanel(document.getElementById("sidebar") as HTMLElement);
+    this.directionsRenderer.setMap(this.map)
+    this.directionsRenderer.setPanel(document.getElementById("sidebar") as HTMLElement)
 
-    const destination = { lat: p.lat, lng: p.lon }; 
-    const origin = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon };
-    const selectedMode = this.form.value.transportMode as keyof typeof google.maps.TravelMode; 
+    const destination = { lat: p.lat, lng: p.lon }
+    const origin = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon }
+    const selectedMode = this.form.value.transportMode as keyof typeof google.maps.TravelMode
 
     this.directionsService.route(
       {
@@ -121,10 +120,10 @@ export class ViewComponent {
         destination: destination,
         travelMode: google.maps.TravelMode[selectedMode]
       }).then((response) => {
-        this.directionsRenderer.setDirections(response);
+        this.directionsRenderer.setDirections(response)
         console.log(response)
       })
-      .catch((e) => window.alert("Directions request failed due to " + e.message));
+      .catch((e) => window.alert("Directions request failed due to " + e.message))
   }
 
   isRouteVisible(p: any): boolean {

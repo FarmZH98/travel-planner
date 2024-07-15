@@ -26,7 +26,6 @@ export class LoginComponent implements OnInit {
   }
 
   async login() {
-    console.info(">>> form: ", this.form.value)
 
     //communicate with backend
     await this.loginService.login(this.form.value['username'], this.form.value['password'])

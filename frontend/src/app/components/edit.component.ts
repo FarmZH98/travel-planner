@@ -32,30 +32,30 @@ export class EditComponent implements OnInit{
   private readonly travelService = inject(TravelService)
   private readonly activatedRoute = inject(ActivatedRoute)
   private readonly weatherService = inject(WeatherService)
-  private readonly directionsService = new google.maps.DirectionsService();
-  private readonly directionsRenderer = new google.maps.DirectionsRenderer();
+  private readonly directionsService = new google.maps.DirectionsService()
+  private readonly directionsRenderer = new google.maps.DirectionsRenderer()
   private readonly store = inject(Store)
 
   form!: FormGroup
   trip$: Observable<Travel>
 
-  gplace: any;
-  places: Place[] = [];
-  addressError: string | null = null;
-  map: google.maps.Map | null = null;
-  markers: any[] = [];
-  token: string;
-  trip: any;
-  weather: any;
+  gplace: any
+  places: Place[] = []
+  addressError: string | null = null
+  map: google.maps.Map | null = null
+  markers: any[] = []
+  token: string
+  trip: any
+  weather: any
   isEdited: boolean = false
 
   //Ollama
-  answers: any[] = [];
-  questionSent: boolean = false;
-  ollamaForm!: FormGroup;
-  ollamaPlaces : any[] = [];
-  ollamaMainAnswer: string = '';
-  ollamaVisible = false;
+  answers: any[] = []
+  questionSent: boolean = false
+  ollamaForm!: FormGroup
+  ollamaPlaces : any[] = []
+  ollamaMainAnswer: string = ''
+  ollamaVisible = false
   private readonly ollamaService = inject(OllamaService)
 
   constructor(private fb: FormBuilder) {
@@ -72,7 +72,7 @@ export class EditComponent implements OnInit{
 
   async ngOnInit(){
     //check for token
-    this.token = localStorage.getItem('token');
+    this.token = localStorage.getItem('token')
     if(localStorage.getItem('token') == null) {
       this.router.navigate(['/'])
     } 
@@ -105,13 +105,13 @@ export class EditComponent implements OnInit{
           strictBounds: false,
         };
     
-        const input = document.getElementById('address') as HTMLInputElement;
-        const autocomplete = new google.maps.places.Autocomplete(input, options);
+        const input = document.getElementById('address') as HTMLInputElement
+        const autocomplete = new google.maps.places.Autocomplete(input, options)
         autocomplete.addListener('place_changed', () => {
-          this.gplace = autocomplete?.getPlace();
+          this.gplace = autocomplete?.getPlace()
         });
     
-        const mapElement = document.getElementById('map') as HTMLElement;
+        const mapElement = document.getElementById('map') as HTMLElement
         // add markers and focus the map on the last marker
         this.map = new google.maps.Map(mapElement, {
           center: { lat: 1.2908306, lng: 103.7764078 },
@@ -146,8 +146,8 @@ export class EditComponent implements OnInit{
   deleteAddress(place: any) {
     const idx = this.places.indexOf(place)
     this.places.splice(idx, 1)
-    this.markers[idx].setMap(null);
-    this.markers.splice(idx, 1);
+    this.markers[idx].setMap(null)
+    this.markers.splice(idx, 1)
   }
 
   getCoordinates() {
@@ -159,8 +159,8 @@ export class EditComponent implements OnInit{
           console.log(coordinates)
           this.updateMap(coordinates.lat, coordinates.lng);
           const place = {address: this.gplace.formatted_address, lat: coordinates.lat, lon: coordinates.lng, name: this.gplace.name, url: this.gplace.url}
-          this.places.push(place);
-          this.form.markAsDirty();
+          this.places.push(place)
+          this.form.markAsDirty()
         })
         .catch(err => {
           this.addressError = err;
@@ -171,9 +171,9 @@ export class EditComponent implements OnInit{
 
   updateMapForExistingPlace(lat: number, lng: number, address: string) {
     if (this.map) {
-      const location = new google.maps.LatLng(lat, lng);
-      this.map.setCenter(location);
-      this.map.setZoom(15);
+      const location = new google.maps.LatLng(lat, lng)
+      this.map.setCenter(location)
+      this.map.setZoom(15)
 
       this.markers.push(new google.maps.Marker({
         position: location,
@@ -186,8 +186,8 @@ export class EditComponent implements OnInit{
   updateMap(lat: number, lng: number) {
     if (this.map) {
       const location = new google.maps.LatLng(lat, lng);
-      this.map.setCenter(location);
-      this.map.setZoom(15);
+      this.map.setCenter(location)
+      this.map.setZoom(15)
 
       this.markers.push(new google.maps.Marker({
         position: location,
@@ -198,14 +198,14 @@ export class EditComponent implements OnInit{
   }
 
   calculateRoute(p: any): void {
-    var idx = this.places.indexOf(p);
+    var idx = this.places.indexOf(p)
 
-    this.directionsRenderer.setMap(this.map);
-    this.directionsRenderer.setPanel(document.getElementById("sidebar") as HTMLElement);
+    this.directionsRenderer.setMap(this.map)
+    this.directionsRenderer.setPanel(document.getElementById("sidebar") as HTMLElement)
 
-    const destination = { lat: p.lat, lng: p.lon }; 
-    const origin = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon }; 
-    const selectedMode = this.form.value.transportMode as keyof typeof google.maps.TravelMode;
+    const destination = { lat: p.lat, lng: p.lon }
+    const origin = { lat: this.places[idx-1].lat, lng: this.places[idx-1].lon } 
+    const selectedMode = this.form.value.transportMode as keyof typeof google.maps.TravelMode
 
     this.directionsService.route(
       {
@@ -282,33 +282,33 @@ export class EditComponent implements OnInit{
 
   //referred from https://github.com/kenken64/ollama-app/blob/main/client/src/app/chat/
   sendMessage() {
-    console.log("Sending...");
+    console.log("Sending...")
     if(this.ollamaForm.valid){
       const text = this.ollamaForm.value.text;
       const question = {by: "You", message: text}
       this.answers.push(question)
-      console.log('User: ' + text);
+      console.log('User: ' + text)
       //this.messages.push({text: text, sender: 'User', timestamp: new Date()});
-      this.questionSent = true;
+      this.questionSent = true
       this.ollamaPlaces = []
       this.ollamaService.chatWithOllama(text).then((response: any) => {
         console.log(response)
         var responseFormatted = this.filterOllamaResponse(response.answer)
         const answer = {by: "Ollama", message: responseFormatted}
         this.answers.push(answer)
-        this.questionSent = false;
+        this.questionSent = false
       })
       .catch(err => {
         alert(err.message)
-        console.log(err);
-        this.questionSent = false;
+        console.log(err)
+        this.questionSent = false
       });
-      this.ollamaForm.reset();
+      this.ollamaForm.reset()
     }
   }
 
   filterOllamaResponse(responseRaw: string) {
-    var response = JSON.parse(responseRaw.trim());
+    var response = JSON.parse(responseRaw.trim())
 
     response.Places.forEach((place : any) => {
       this.ollamaPlaces.push(place)
@@ -322,20 +322,20 @@ export class EditComponent implements OnInit{
     if (address) {
       this.googleMapsLoader.getCoordinates(address)
         .then(coordinates => {
-          this.addressError = null;
+          this.addressError = null
           console.log(coordinates)
           this.updateMapForExistingPlace(coordinates.lat, coordinates.lng, address);
           const place = {address: address, lat: coordinates.lat, lon: coordinates.lng, name: ollamaPlace.Place, url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
-          this.places.push(place);
+          this.places.push(place)
         })
         .catch(err => {
-          this.addressError = err;
+          this.addressError = err
           console.log(this.addressError)
         });
     }
   }
   
   toggleOllama() {
-    this.ollamaVisible = !this.ollamaVisible;
+    this.ollamaVisible = !this.ollamaVisible
   }
 }

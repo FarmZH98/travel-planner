@@ -6,32 +6,29 @@
         <title>Login</title>
     </head>
     <body>
-        <mat-toolbar color="primary">
-            <mat-toolbar-row>
-                <span>Login</span>
-            </mat-toolbar-row>
-        </mat-toolbar>
-        <mat-divider></mat-divider>
-        <div>
-            <form [formGroup]="form" (submit)="login()">
-                <div>
-                    <mat-form-field>
-                        <mat-label>Username: </mat-label>
-                        <input matInput placeholder="Username" formControlName="username">
-                    </mat-form-field>
-                </div>
-                <div>
-                    <mat-form-field>
-                        <mat-label>Password: </mat-label>
-                        <input matInput placeholder="Password" type="password" formControlName="password">
-                    </mat-form-field>
-                </div>
-                <div class="button-container">
-                    <button class="login-button" mat-stroked-button type="submit" [disabled]="form.invalid">Login</button>
-                    <button class="signup-button" mat-stroked-button type="button" [routerLink]="['/signup']">Sign Up</button>
-                </div>
-            </form>
-        </div>
-        
+        <form [formGroup]="form" (submit)="login()">
+            <mat-toolbar color="primary">
+                <mat-toolbar-row>
+                    <span>Login</span>
+                </mat-toolbar-row>
+            </mat-toolbar>
+            <mat-divider></mat-divider>
+            <div>
+                <mat-form-field>
+                    <mat-label>Username: </mat-label>
+                    <input matInput placeholder="Username" formControlName="username">
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field>
+                    <mat-label>Password: </mat-label>
+                    <input matInput placeholder="Password" type="password" formControlName="password">
+                </mat-form-field>
+            </div>
+            <div class="button-container">
+                <button class="login-button" mat-stroked-button type="submit" [disabled]="form.invalid">Login</button>
+                <button class="signup-button" mat-stroked-button type="button" [routerLink]="['/signup']">Sign Up</button>
+            </div>
+        </form>
     </body>
 </html>

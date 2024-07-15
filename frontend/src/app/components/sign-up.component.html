@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login</title>
+        <title>Sign Up</title>
     </head>
     <body>
         <mat-toolbar color="primary">
@@ -24,7 +24,7 @@
                           }
                     </mat-form-field>
                 </div>
-                <div class="dense-1">
+                <div>
                     <mat-form-field>
                         <mat-label>Password: </mat-label>
                         <input [type]="isPasswordVisible ? 'text' : 'password'" matInput placeholder="Password" formControlName="password" id="password">
@@ -63,7 +63,10 @@
                         <mat-radio-button *ngFor="let g of genders" value="{{g}}">{{g}}</mat-radio-button> 
                     </mat-radio-group>
                 </div>
-                <button type="submit" class="signup-button" mat-stroked-button [disabled]="form.invalid">Sign Up</button>
+                <div class="button-container">
+                    <button type="submit" class="signup-button" mat-stroked-button [disabled]="form.invalid">Sign Up</button>
+                </div>
+                
             </form>
         </div>
     </body>

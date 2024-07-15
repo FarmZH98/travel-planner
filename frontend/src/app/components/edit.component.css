@@ -39,14 +39,21 @@ mat-form-field {
 }
 
 .content-container {
+    background-image: url('/../../assets/icons/machu_picchu-editpage.jpg');  
+    background-size: cover;
+    background-attachment: fixed;
+    background-color: rgba(255, 255, 255, 0.7);
     display: flex;
-    height: calc(100vh - 64px); /* 64px is the height of the toolbar */
+    height: calc(100vh - 64px);
 }
 
 .content {
     flex: 3;
     padding: 1rem;
     overflow-y: auto;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: space-between;
 }
 
 .submit {
@@ -67,6 +74,7 @@ mat-form-field {
     overflow-y: auto;
     overflow-x: hidden;
     border-left: 1px solid #ccc;
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
 .toggle-ollama {

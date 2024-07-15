@@ -84,13 +84,12 @@
                             <button type="button" title="weather" mat-icon-button (click)="getWeather(p)">
                                 <mat-icon>wb_sunny</mat-icon>
                             </button>
-                            <button type="button" title="public transit directions" mat-icon-button (click)="calculateRoute(p)" *ngIf="this.isRouteVisible(p)">
+                            <button type="button" title="directions" mat-icon-button (click)="calculateRoute(p)" *ngIf="this.isRouteVisible(p)">
                                 <mat-icon> directions</mat-icon>
                             </button>
                         </mat-list-item>
                     </mat-list>
                 </div>
-
                 
                 <div class="weatherbox">
                     @if (weather) {
@@ -103,11 +102,12 @@
 
                 <button class="submit" type="submit" mat-stroked-button [disabled]="form.invalid">Create</button>
             </form>
+            <div class="ollama-button-div">
+                <button type="button" title="Chat with Ollama AI" class="toggle-ollama" mat-button (click)="toggleOllama()">
+                    <img src="assets/icons/ollama.png" alt="ollama" style="height: 30px;">
+                </button>
+            </div>
         </div>
-
-        <button type="button" title="Chat with Ollama AI" class="toggle-ollama" mat-button (click)="toggleOllama()">
-            <img src="assets/icons/ollama.png" alt="ollama" style="height: 30px;">
-        </button>
         <div class="ollama-container" *ngIf="ollamaVisible" [@slideInOut]>
             <div class="ollama-header">
                 <h2 class="ollama-title">Ollama Chat App  </h2>

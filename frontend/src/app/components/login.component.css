@@ -1,3 +1,28 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url('/../../assets/icons/fuji-loginpage.jpg'); 
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+form {
+    width: 50%;
+    max-width: 800px; 
+    background-color: rgba(255, 255, 255, 0.8); 
+    padding: 40px; 
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+}
+
 .login-button {
     border: 2px solid black;
     background: green;
@@ -11,4 +36,21 @@
 .button-container {
     display: flex;
     gap: 10px;
+}
+
+mat-form-field{
+    width: 100%
+}
+
+@media (max-width: 768px) {
+    form {
+        width: 70%;
+    }
+}
+
+@media (max-width: 480px) {
+    form {
+        width: 90%;
+        padding: 20px;
+    }
 }

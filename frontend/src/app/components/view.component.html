@@ -16,7 +16,7 @@
 
     <mat-divider></mat-divider>
     <div class="content">
-        <mat-card style="background-color: transparent;" *ngIf="trip">
+        <mat-card *ngIf="trip">
             <mat-card-header>
               <h2><strong>{{ trip.title }}</strong></h2>
             </mat-card-header>
@@ -38,10 +38,10 @@
               <p>
                 <mat-list-item *ngFor="let p of places">
                     <a href="{{p.url}}" target="_blank">{{p.name}} </a> : {{p.address}}
-                    <button type="button" mat-icon-button (click)="getWeather(p)">
+                    <button type="button" title="weather" mat-icon-button (click)="getWeather(p)">
                         <mat-icon>wb_sunny</mat-icon>
                     </button>
-                    <button type="button" mat-icon-button (click)="calculateRoute(p)" *ngIf="this.isRouteVisible(p)">
+                    <button type="button" title="directions" mat-icon-button (click)="calculateRoute(p)" *ngIf="this.isRouteVisible(p)">
                         <mat-icon> directions</mat-icon>
                     </button>
                 </mat-list-item>
@@ -53,7 +53,7 @@
                 <google-map>
                 </google-map>
             </div>
-            <div id="sidebar"></div>
+            <div id="sidebar"><h3 style="display: flex; align-items: center; justify-content: center;">Directions</h3></div>
         </div>
         <br>
         <div class="weatherbox">
@@ -64,7 +64,7 @@
             }
             
         </div>
-        <button type="button" (click)="sendEmail()">Email Me</button>
+        <button type="button" class="email-button" (click)="sendEmail()">Email Me</button>
     </div>
 </body>
 </html>
