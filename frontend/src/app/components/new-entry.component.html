@@ -48,8 +48,10 @@
                 <br>
                 <div class="addressEntry">
                     <p>Add places to visit:</p>
-                    <input id="address" placeholder="Enter address" />
-                    <button type="button" (click)="getCoordinates()">Add</button>
+                    <mat-form-field>
+                        <input matInput id="address" placeholder="Enter address" />
+                    </mat-form-field>
+                    <button type="button" class="add-address" mat-stroked-button (click)="getCoordinates()">Add</button>
                 
                     <div *ngIf="addressError">
                     <p>Error: {{ addressError }}</p>
@@ -104,7 +106,7 @@
             </form>
             <div class="ollama-button-div">
                 <button type="button" title="Chat with Ollama AI" class="toggle-ollama" mat-button (click)="toggleOllama()">
-                    <img src="assets/icons/ollama.png" alt="ollama" style="height: 30px;">
+                    <img src="assets/icons/ollama.png" alt="ollama" style="height: 50px;">
                 </button>
             </div>
         </div>
@@ -132,12 +134,12 @@
         
             <div class="ollama-input">
                 <form [formGroup]="ollamaForm" id="ollamaForm" (ngSubmit)="sendMessage()">
-                    <mat-form-field class="example-full-width" appearance="fill">
+                    <mat-form-field appearance="fill">
                         <input matInput formControlName="text" placeholder="Type a message">
                         <mat-error *ngIf="ollamaForm?.get('text')?.invalid">Message is required</mat-error>
                     </mat-form-field>
                     <button mat-fab extended color="primary" type="submit" [disabled]="questionSent">
-                        <mat-icon>send</mat-icon>
+                        send
                     </button>
                 </form>
             </div>
