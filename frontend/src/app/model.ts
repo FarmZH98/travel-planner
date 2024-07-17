@@ -36,10 +36,6 @@ export interface WeatherData {
     description: string
     city: string
 }
-  
-export interface TravelsSlice {
-    trips: Travel[]
-}
 
 export interface PlaceEmail {
     weather: string

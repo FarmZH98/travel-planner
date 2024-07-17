@@ -37,7 +37,6 @@ import { leaveEditPage, leaveNewPage } from './guard';
 import { WeatherService } from './services/weather.service';
 import { OllamaService } from './services/ollama.service';
 import { ServiceWorkerModule } from '@angular/service-worker';
-import { TravelStore } from './travel.store';
 import { StoreModule } from '@ngrx/store';
 import { travelReducer } from './state/travel.reducer';
 
@@ -90,7 +89,7 @@ const appRoutes: Routes = [
     })
   ],
   providers: [
-    TravelService, LoginService, WeatherService, OllamaService, TravelStore, FormRepository, provideAnimationsAsync()
+    TravelService, LoginService, WeatherService, OllamaService, FormRepository, provideAnimationsAsync()
   ],
   bootstrap: [AppComponent]
 })

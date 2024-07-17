@@ -14,7 +14,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   templateUrl: './view.component.html',
   styleUrl: './view.component.css'
 })
-export class ViewComponent {
+export class ViewComponent implements OnInit {
 
   private readonly router = inject(Router)
   private readonly travelService = inject(TravelService)
