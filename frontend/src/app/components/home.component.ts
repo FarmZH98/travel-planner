@@ -30,10 +30,6 @@ export class HomeComponent implements OnInit {
         for(var i=0; i<response.travels.length; ++i) {
           var trip = JSON.parse(response.travels[i])
           console.log(trip)
-          trip.startDate = trip.startDate.replace(' 00:00:00 GMT+08:00', '');
-          trip.startDate = trip.startDate.replace(' 16:00:00 UTC', '');
-          trip.endDate = trip.endDate.replace(' 00:00:00 GMT+08:00', '');
-          trip.endDate = trip.endDate.replace(' 16:00:00 UTC', '');
           this.plans.push(trip)
         }
         console.log(this.plans)

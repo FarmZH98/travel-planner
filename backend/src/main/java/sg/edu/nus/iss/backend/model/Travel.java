@@ -1,5 +1,9 @@
 package sg.edu.nus.iss.backend.model;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -26,11 +30,19 @@ public class Travel {
     private String id;
 
     public String getStartDateFormatted() {
-        return startDate.toString().replace(" 00:00:00 GMT+08:00", "");
+        return dateFormatted(startDate);
     }
 
     public String getEndDateFormatted() {
-        return endDate.toString().replace(" 00:00:00 GMT+08:00", "");
+        return dateFormatted(endDate);
+    }
+
+    private String dateFormatted(Date date) {
+        Instant instant = date.toInstant();
+        ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("GMT+08:00"));
+        String formattedLocalDate = zonedDateTime.format(DateTimeFormatter.RFC_1123_DATE_TIME);
+
+        return formattedLocalDate.replace(" 00:00:00 +0800", "");
     }
 
     public String toSummaryJsonString() {
@@ -38,8 +50,8 @@ public class Travel {
         JsonObject taskAsJson = Json.createObjectBuilder()
         .add("id", id)
         .add("title", title)
-        .add("startDate", startDate.toString())
-        .add("endDate", endDate.toString())
+        .add("startDate", getStartDateFormatted())
+        .add("endDate",  getEndDateFormatted())
         .add("token", token)
         .build();
 
