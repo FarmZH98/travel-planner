@@ -4,70 +4,77 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Sign Up</title>
+        <link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet">
     </head>
     <body>
-        <mat-toolbar color="primary">
-            <mat-toolbar-row class="mainbar">
-                <span>Sign Up</span>
-                <button type="button" mat-flat-button (click)="back()">Back</button>
-            </mat-toolbar-row>
-        </mat-toolbar>
-        <div class="content">
-            <form [formGroup]="form" (ngSubmit)="signup()">
-                <mat-divider></mat-divider>
-                <div>
-                    <mat-form-field>
-                        <mat-label>Username: </mat-label>
-                        <input matInput placeholder="Username" formControlName="username">
-                        @if (form.get('username')?.hasError('minlength')) {
-                            <mat-error>Username should be at least 5 characters long</mat-error>
-                          }
-                    </mat-form-field>
-                </div>
-                <div>
-                    <mat-form-field>
-                        <mat-label>Password: </mat-label>
-                        <input [type]="isPasswordVisible ? 'text' : 'password'" matInput placeholder="Password" formControlName="password" id="password">
-                        <button type="button" mat-icon-button matSuffix (click)="isPasswordVisible = !isPasswordVisible" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="!isPasswordVisible">
-                            <mat-icon>{{isPasswordVisible ? 'visibility' : 'visibility_off'}}</mat-icon>
-                        </button>
-                        @if (form.get('password')?.hasError('pattern')) {
-                            <mat-error>Password should consists of at least 8 mixed case alphanumeric characters</mat-error>
-                          }
-                    </mat-form-field>
-                </div>
-                <div>
-                    <mat-form-field>
-                        <mat-label>First Name: </mat-label>
-                        <input matInput placeholder="First Name" formControlName="firstname">
-                    </mat-form-field>
-                </div>
-                <div>
-                    <mat-form-field>
-                        <mat-label>Last Name: </mat-label>
-                        <input matInput placeholder="Last Name" formControlName="lastname">
-                    </mat-form-field>
-                </div>
-                <div>
-                    <mat-form-field>
-                        <mat-label>Email: </mat-label>
-                        <input matInput placeholder="Email" formControlName="email">
-                        @if (form.get('email')?.hasError('email')) {
-                            <mat-error>Email is invalid</mat-error>
-                          }
-                    </mat-form-field>
-                </div>
-                <div>
-                    <mat-label>Gender: </mat-label>
-                    <mat-radio-group arial-label="Select an Option" formControlName="gender">
-                        <mat-radio-button *ngFor="let g of genders" value="{{g}}">{{g}}</mat-radio-button> 
-                    </mat-radio-group>
-                </div>
-                <div class="button-container">
-                    <button type="submit" class="signup-button" mat-stroked-button [disabled]="form.invalid">Sign Up</button>
+        <mat-toolbar color="primary" class="top-toolbar">
+            <mat-toolbar-row class="top-toolbar-row">
+                <div class="top-toolbar-title">
+                    <img src="assets/icons/passport.ico" alt="icon" style="height: 50px;"> <span> Travela</span>
                 </div>
                 
-            </form>
-        </div>
+                <button type="button" class="login-button" mat-stroked-button [routerLink]="['/']">Login</button>
+            </mat-toolbar-row>
+        </mat-toolbar>
+
+        <form [formGroup]="form" (submit)="signup()">
+            <mat-toolbar color="primary">
+                <mat-toolbar-row>
+                    <span>Sign Up</span>
+                </mat-toolbar-row>
+            </mat-toolbar>
+            <mat-divider></mat-divider>
+            <div>
+                <mat-form-field>
+                    <mat-label>Username: </mat-label>
+                    <input matInput placeholder="Username" formControlName="username">
+                    @if (form.get('username')?.hasError('minlength')) {
+                        <mat-error>Username should be at least 5 characters long</mat-error>
+                        }
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field>
+                    <mat-label>Password: </mat-label>
+                    <input [type]="isPasswordVisible ? 'text' : 'password'" matInput placeholder="Password" formControlName="password" id="password">
+                    <button type="button" mat-icon-button matSuffix (click)="isPasswordVisible = !isPasswordVisible" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="!isPasswordVisible">
+                        <mat-icon>{{isPasswordVisible ? 'visibility' : 'visibility_off'}}</mat-icon>
+                    </button>
+                    @if (form.get('password')?.hasError('pattern')) {
+                        <mat-error>Password should consists of at least 8 mixed case alphanumeric characters</mat-error>
+                        }
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field>
+                    <mat-label>First Name: </mat-label>
+                    <input matInput placeholder="First Name" formControlName="firstname">
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field>
+                    <mat-label>Last Name: </mat-label>
+                    <input matInput placeholder="Last Name" formControlName="lastname">
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field>
+                    <mat-label>Email: </mat-label>
+                    <input matInput placeholder="Email" formControlName="email">
+                    @if (form.get('email')?.hasError('email')) {
+                        <mat-error>Email is invalid</mat-error>
+                        }
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-label>Gender: </mat-label>
+                <mat-radio-group arial-label="Select an Option" formControlName="gender">
+                    <mat-radio-button *ngFor="let g of genders" value="{{g}}">{{g}}</mat-radio-button> 
+                </mat-radio-group>
+            </div>
+            <div class="button-container">
+                <button type="submit" class="signup-button" mat-stroked-button [disabled]="form.invalid">Sign Up</button>
+            </div> 
+        </form>
     </body>
 </html>
